@@ -1,0 +1,2 @@
+# libctext
+Text Library
