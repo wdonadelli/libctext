@@ -1,16 +1,15 @@
 /*-----------------------------------------------------------------------------
-Library CSRequest (v1.2.0) <wdonadelli@gmail.com>
+Library CText (v1.0.0) <wdonadelli@gmail.com>
 
-This is a library written in C language designed to simplify requests to the
-SQLite database.
+	This is a library written in C language designed to work with character lists 
+	(Strings) in a similar way to object-oriented programming.
 
-https://www.sqlite.org/
-https://github.com/wdonadelli/libcsrequest
-https://wdonadelli.github.io/libcsrequest/
+GitHub:
+	https://github.com/wdonadelli/libctext
+	https://github.com/wdonadelli/libctext.wiki
 
-Ubuntu 18 LTS package: libsqlite3-dev
-
-GCC compilation: gcc -c libcsrequest.c -l sqlite3
+GCC compilation:
+	gcc -c libctext.c
 
 -------------------------------------------------------------------------------
 MIT License
@@ -36,296 +35,191 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -----------------------------------------------------------------------------*/
 
-#ifndef LIBRARY_CSR_H
+#ifndef LIBRARY_CTEXT_H
 
-	#define LIBRARY_CSR_H
+	#define LIBRARY_CTEXT_H
 
 /*-----------------------------------------------------------------------------
-	A presente biblioteca exige as seguintes bibliotecas
+	Bibliotecas necessárias: FIXME precisa de tudo isso mesmo?
 -----------------------------------------------------------------------------*/
-	#include <sqlite3.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <stdarg.h>
 	#include <string.h>
 
 /*-----------------------------------------------------------------------------
-	Estrutura dos registros
-	https://www.sqlite.org/limits.html
-		SQLITE_MAX_LENGTH 1000000000
-		SQLITE_MAX_COLUMN 2000
-		SQLITE_MAX_SQL_LENGTH 1000000
-		18446744073709551616
+	Macros de respostas:
 -----------------------------------------------------------------------------*/
-	typedef struct csrData
-	{
-		char *col;             /* nome da coluna */
-		char *val;             /* valor da coluna */
-		unsigned int where: 1; /* informação sobre o filtro WHERE */
-		struct csrData *next;  /* próximo registro */
-	} csrData;
+	#define CTEXT_OK  0
+	#define CTEXT_ERR 1
 
 /*-----------------------------------------------------------------------------
 	Estrutura do objeto
 -----------------------------------------------------------------------------*/
 	typedef struct
 	{
-		/*-- Métodos acessíveis ao usuário --*/
-		int (*sql)();     /* executa uma instrução SQL */
-		int (*insert)();  /* constrói uma instrução INSERT (ver método add) */
-		int (*replace)(); /* constrói uma instrução REPLACE (ver método add) */
-		int (*update)();  /* constrói uma instrução UPDATE (ver método add) */
-		int (*delete)();  /* constrói uma instrução DELETE (ver método add) */
-		int (*select)();  /* constrói uma instrução SELECT (ver método add) */
-		int (*create)();  /* constrói uma instrução CREATE TABLE (ver método add) */
-		int (*drop)();    /* constrói uma instrução DROP TABLE */
-		int (*add)();     /* registra informações para contrutores acima */
-		int (*clear)();   /* apaga registros (ver método add) */
-		char *(*fetch)(); /* retorna o valor da coluna (ver método sql) */
-		int (*status)();  /* retorna o status da última solicitação */
-		char *(*info)();  /* retorna a mensagem da última solicitação */
-		void (*debug)();  /* liga/desliga a depuração */
-		void (*free)();   /* libera memória */
-		
-		/*-- Métodos/Atributos inacessíveis ao usuário --*/
-		void (*reader)();      /* guarda a função de pesquisa */
-		char *file;            /* caminho para o banco de dados */
-		int print;             /* registra o acionamento da depuração */
-		int code;              /* registra o retorno da última operação */
-		char *message;         /* registra mensagem de erro da última operação */
-		unsigned long int row; /* guarda o número da linha */
-		unsigned int len;      /* guarda o número de colunas */
-		char **col;            /* guarda o array com nomes das colunas */
-		char **val;            /* guarda o array com valores das colunas */
-		csrData *data;         /* guarda a estrutura de registros */
-		
-	} csrObject;
+		/*-- Métodos/Atributos internos */
+		char *_string; /* registra a String */
+
+		/*-- Métodos/Atributos acessíveis ao usuário --*/
+		ctextObject (*set)();   /* define uma string */
+		ctextObject (*ltrim)(); /* apara o lado esquerdo */
+		ctextObject (*rtrim)(); /* apara o lado direito */
+		ctextObject (*trim)();  /* apara ambos os lados */
+		ctextObject (*clear)(); /* remove os espaços extras */
+		ctextObject (*add)();   /* acrescenta string */
+		ctextObject (*print)(); /* imprimi a string na tela */
+		ctextObject (*lower)(); /* caixa baixa */
+		ctextObject (*upper)(); /* caixa alta */
+		ctextObject (*title)(); /* caixa alta apenas na letras iniciais */
+
+		int (*len)();   /* devolve o tamanho da string */
+		char *(*get)(); /* retorna a string */
+		void (*free)(); /* libera memória */
+	} ctextObject;
 
 /*-----------------------------------------------------------------------------
-	Protótipos
-
-	Os protótipos abaixo não devem ser utilizadas para manipulação da
-	biblioteca, sua utilidade se destina a criação do métodos secundários da
-	ferramenta principal.
-	Retornos dos protótipos:
-		CSR_OK    se não ocorreu erro na requisição SQL ou nos métodos
-		CSR_FAIL  se ocorreu erro na requisição SQL
-		CSR_ERROR se ocorreu erro nos parâmetros do método 
+	__ctext_set__ ()
+		Define o valor da string
+		str: valor da string a ser definida
 -----------------------------------------------------------------------------*/
-	#define CSR_OK   0
-	#define CSR_FAIL 1
-	#define CSR_ERR -1
+	int __ctext_set__ (ctextObject *self, char *str);
+
+	#define __CTEXT_SQL__(SELF)                    \
+		ctextObject __ctext_set__##SELF (char *str) \
+		{                                           \
+			__ctext_set__(&SELF, str);               \
+			return SELF;                             \
+		}                                           \
+		SELF.set = __ctext_set__##SELF;             \
 
 /*-----------------------------------------------------------------------------
-	__csr_sql__ () executa uma instrução SQL
-	query:  string contendo a instrução SQL
-	reader: função a executar durante a pesquisa (opcional)
+	__ctext_ltrim__ ()
+		Elimina os espaços à esquerda
 -----------------------------------------------------------------------------*/
-	int __csr_sql__ (csrObject *self, char *query, void (*reader)());
+	int __ctext_ltrim__ (ctextObject *self);
 
-	#define __CSR_SQL__(SELF)                                \
-		int __csr_sql__##SELF (char *query, void (*reader)()) \
-		{                                                     \
-			return __csr_sql__(&SELF, query, reader);          \
-		}                                                     \
-		SELF.sql = __csr_sql__##SELF;                         \
-
-/*-----------------------------------------------------------------------------
-	__csr_insert__ () constrói uma instrução INSERT e a executa a partir das
-	informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_insert__ (csrObject *self, char *table);
-
-	#define __CSR_INSERT__(SELF)               \
-		int __csr_insert__##SELF (char *table)  \
-		{                                       \
-			return __csr_insert__(&SELF, table); \
-		}                                       \
-		SELF.insert = __csr_insert__##SELF;     \
-
-/*-----------------------------------------------------------------------------
-	__csr_replace__ () constrói uma instrução REPLACE e a executa a partir das
-	informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_replace__ (csrObject *self, char *table);
-
-	#define __CSR_REPLACE__(SELF)               \
-		int __csr_replace__##SELF (char *table)  \
-		{                                        \
-			return __csr_replace__(&SELF, table); \
-		}                                        \
-		SELF.replace = __csr_replace__##SELF;    \
-
-/*-----------------------------------------------------------------------------
-	__csr_update__ () constrói uma instrução UPDATE e a executa a partir das
-	informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_update__ (csrObject *self, char *table);
-
-	#define __CSR_UPDATE__(SELF)               \
-		int __csr_update__##SELF (char *table)  \
-		{                                       \
-			return __csr_update__(&SELF, table); \
-		}                                       \
-		SELF.update = __csr_update__##SELF;     \
-
-/*-----------------------------------------------------------------------------
-	__csr_delete__ () constrói uma instrução DELETE e a executa a partir das
-	informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_delete__ (csrObject *self, char *table);
-
-	#define __CSR_DELETE__(SELF)               \
-		int __csr_delete__##SELF (char *table)  \
-		{                                       \
-			return __csr_delete__(&SELF, table); \
-		}                                       \
-		SELF.delete = __csr_delete__##SELF;     \
-
-
-
-
-/*-----------------------------------------------------------------------------
-	__csr_drop__ () constrói uma instrução DROP TABLE
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_drop__ (csrObject *self, char *table);
-
-	#define __CSR_DROP__(SELF)               \
-		int __csr_drop__##SELF (char *table)  \
-		{                                     \
-			return __csr_drop__(&SELF, table); \
-		}                                     \
-		SELF.drop = __csr_drop__##SELF;       \
-
-/*-----------------------------------------------------------------------------
-	__csr_create__ () constrói uma instrução CREATE TABLE e a executa a partir
-	das informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
------------------------------------------------------------------------------*/
-	int __csr_create__ (csrObject *self, char *table);
-
-	#define __CSR_CREATE__(SELF)               \
-		int __csr_create__##SELF (char *table)  \
-		{                                       \
-			return __csr_create__(&SELF, table); \
-		}                                       \
-		SELF.create = __csr_create__##SELF;     \
-
-/*-----------------------------------------------------------------------------
-	__csr_select__ () constrói uma instrução SELECT e a executa a partir das
-	informações de registros adicionados pelo método add()
-	table: string contendo o nome da tabela
-	reader: função a executar durante a pesquisa (opcional)
------------------------------------------------------------------------------*/
-	int __csr_select__ (csrObject *self, char *table, void (*reader)());
-
-	#define __CSR_SELECT__(SELF)                                \
-		int __csr_select__##SELF (char *table, void (*reader)()) \
-		{                                                        \
-			return __csr_select__(&SELF, table, reader);          \
-		}                                                        \
-		SELF.select = __csr_select__##SELF;                      \
-
-/*-----------------------------------------------------------------------------
-	__csr_add__ () adiciona/altera registros para execução dos métodos
-	construtores de instruções SQL
-	column: string contendo o nome da coluna
-	value:  string contendo o valor da coluna
------------------------------------------------------------------------------*/
-	int __csr_add__ (csrObject *self, char *column, char *value, int where);
-
-	#define __CSR_ADD__(SELF)                                       \
-		int __csr_add__##SELF (char *column, char *value, int where) \
-		{                                                            \
-			return __csr_add__(&SELF, column, value, where);          \
-		}                                                            \
-		SELF.add = __csr_add__##SELF;                                \
-
-/*-----------------------------------------------------------------------------
-	__csr_clear__ () limpa os dados adicionados pelo método add
------------------------------------------------------------------------------*/
-	int __csr_clear__ (csrObject *self);
-
-	#define __CSR_CLEAR__(SELF)          \
-		int __csr_clear__##SELF ()        \
-		{                                 \
-			return __csr_clear__(&SELF);   \
-		}                                 \
-		SELF.clear = __csr_clear__##SELF; \
-
-/*-----------------------------------------------------------------------------
-	__csr_fetch__ () retorna a string com o valor da coluna na instrução SELECT
-	Obs.: Retorna NULL se a coluna é nula, não foi encontrada ou quando ocorre
-	um erro
------------------------------------------------------------------------------*/
-	char *__csr_fetch__ (csrObject *self, char *col);
-
-	#define __CSR_FETCH__(SELF)              \
-		char *__csr_fetch__##SELF (char *col) \
-		{                                     \
-			return __csr_fetch__(&SELF, col);  \
-		}                                     \
-		SELF.fetch = __csr_fetch__##SELF;     \
-
-/*-----------------------------------------------------------------------------
-	__csr_status__ () retorna o status da última solicitação
------------------------------------------------------------------------------*/
-	int __csr_status__ (csrObject *self);
-
-	#define __CSR_STATUS__(SELF)           \
-		int __csr_status__##SELF ()         \
-		{                                   \
-			return __csr_status__(&SELF);    \
-		}                                   \
-		SELF.status = __csr_status__##SELF; \
-
-/*-----------------------------------------------------------------------------
-	__csr_info__ () retorna a menssagem da última solicitação
------------------------------------------------------------------------------*/
-	char *__csr_info__ (csrObject *self);
-
-	#define __CSR_INFO__(SELF)         \
-		char *__csr_info__##SELF ()     \
-		{                               \
-			return __csr_info__(&SELF);  \
-		}                               \
-		SELF.info = __csr_info__##SELF; \
-
-/*-----------------------------------------------------------------------------
-	__csr_debug__ () liga/desliga depuração
------------------------------------------------------------------------------*/
-	void __csr_debug__ (csrObject *self, int val);
-
-	#define __CSR_DEBUG__(SELF)             \
-		void __csr_debug__##SELF (int val)   \
+	#define __CTEXT_LTRIM__(SELF)           \
+		ctextObject __ctext_ltrim__##SELF () \
 		{                                    \
-			__csr_debug__(&SELF, val); \
+			__ctext_ltrim__(&SELF);           \
+			return SELF;                      \
 		}                                    \
-		SELF.debug = __csr_debug__##SELF;    \
+		SELF.ltrim = __ctext_ltrim__##SELF;  \
 
 /*-----------------------------------------------------------------------------
-	__csr_free__ () libera memória
+	__ctext_rtrim__ ()
+		Elimina os espaços à direita
 -----------------------------------------------------------------------------*/
-	void __csr_free__ (csrObject *self);
+	int __ctext_rtrim__ (ctextObject *self);
 
-	#define __CSR_FREE__(SELF)         \
-		void __csr_free__##SELF ()      \
+	#define __CTEXT_RTRIM__(SELF)           \
+		ctextObject __ctext_rtrim__##SELF () \
+		{                                    \
+			__ctext_rtrim__(&SELF);           \
+			return SELF;                      \
+		}                                    \
+		SELF.rtrim = __ctext_rtrim__##SELF;  \
+
+/*-----------------------------------------------------------------------------
+	__ctext_trim__ ()
+		Elimina os espaços à esquerda e à direita
+-----------------------------------------------------------------------------*/
+	int __ctext_trim__ (ctextObject *self);
+
+	#define __CTEXT_TRIM__(SELF)           \
+		ctextObject __ctext_trim__##SELF () \
+		{                                   \
+			return __ctext_trim__(&SELF);    \
+			return SELF;                     \
+		}                                   \
+		SELF.trim = __ctext_trim__##SELF;   \
+
+/*-----------------------------------------------------------------------------
+	__ctext_clear__ ()
+		Elimina os espaços extras
+-----------------------------------------------------------------------------*/
+	int __ctext_clear__ (ctextObject *self);
+
+	#define __CTEXT_CLEAR__(SELF)           \
+		ctextObject __ctext_clear__##SELF () \
+		{                                    \
+			return __ctext_clear__(&SELF);    \
+			return SELF;                      \
+		}                                    \
+		SELF.clear = __ctext_clear__##SELF;  \
+
+/*-----------------------------------------------------------------------------
+	__ctext_add__ ()
+		Acrescenta a String ao fim
+-----------------------------------------------------------------------------*/
+	int __ctext_add__ (ctextObject *self);
+
+	#define __CTEXT_ADD__(SELF)           \
+		ctextObject __ctext_add__##SELF () \
+		{                                  \
+			return __ctext_add__(&SELF);    \
+			return SELF;                    \
+		}                                  \
+		SELF.add = __ctext_add__##SELF;    \
+
+
+
+/*
+		int (*print)();
+		int (*lower)();
+		int (*upper)();
+		int (*title)();
+*/
+
+
+
+
+/*-----------------------------------------------------------------------------
+	__ctext_get__ ()
+		Retorna o valor da String do "objeto"
+-----------------------------------------------------------------------------*/
+	char *__ctext_get__ (ctextObject *self);
+
+	#define __CTEXT_GET__(SELF)        \
+		char *__ctext_get__##SELF ()    \
 		{                               \
-			__csr_free__(&SELF);  \
+			return __ctext_get__(&SELF); \
 		}                               \
-		SELF.free = __csr_free__##SELF; \
+		SELF.get = __ctext_get__##SELF; \
+
+/*-----------------------------------------------------------------------------
+	__ctext_len__ ()
+		Retorna o tamanho da String do "objeto"
+-----------------------------------------------------------------------------*/
+	int __ctext_len__ (ctextObject *self);
+
+	#define __CTEXT_LEN__(SELF)        \
+		int __ctext_len__##SELF ()    \
+		{                               \
+			return __ctext_len__(&SELF); \
+		}                               \
+		SELF.len = __ctext_len__##SELF; \
+
+/*-----------------------------------------------------------------------------
+	__ctext_free__ ()
+		libera memória
+-----------------------------------------------------------------------------*/
+	void __ctext_free__ (ctextObject *self);
+
+	#define __CTEXT_FREE__(SELF)         \
+		void __ctext_free__##SELF ()      \
+		{                               \
+			__ctext_free__(&SELF);  \
+		}                               \
+		SELF.free = __ctext_free__##SELF; \
 
 /*-----------------------------------------------------------------------------
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
 	#define new_CSR(OBJECT, FILE) \
                                  \
-		csrObject OBJECT;		      \
+		ctextObject OBJECT;		      \
 		OBJECT.file    = FILE;     \
 		OBJECT.message = NULL;     \
 		OBJECT.code    = CSR_OK;   \
@@ -337,20 +231,20 @@ SOFTWARE.
 		OBJECT.val     = NULL;     \
 		OBJECT.reader  = NULL;     \
                                  \
-		__CSR_SQL__(OBJECT);       \
-		__CSR_INSERT__(OBJECT);    \
-		__CSR_REPLACE__(OBJECT);   \
-		__CSR_UPDATE__(OBJECT);    \
-		__CSR_DELETE__(OBJECT);    \
-		__CSR_SELECT__(OBJECT);    \
-		__CSR_CREATE__(OBJECT);    \
-		__CSR_DROP__(OBJECT);      \
-		__CSR_ADD__(OBJECT);       \
-		__CSR_CLEAR__(OBJECT);     \
-		__CSR_FETCH__(OBJECT);     \
-		__CSR_STATUS__(OBJECT);    \
-		__CSR_INFO__(OBJECT);      \
-		__CSR_DEBUG__(OBJECT);     \
-		__CSR_FREE__(OBJECT);      \
+		__ctext_SQL__(OBJECT);       \
+		__ctext_INSERT__(OBJECT);    \
+		__ctext_REPLACE__(OBJECT);   \
+		__ctext_UPDATE__(OBJECT);    \
+		__ctext_DELETE__(OBJECT);    \
+		__ctext_SELECT__(OBJECT);    \
+		__ctext_CREATE__(OBJECT);    \
+		__ctext_DROP__(OBJECT);      \
+		__ctext_ADD__(OBJECT);       \
+		__ctext_CLEAR__(OBJECT);     \
+		__ctext_FETCH__(OBJECT);     \
+		__ctext_STATUS__(OBJECT);    \
+		__ctext_INFO__(OBJECT);      \
+		__ctext_DEBUG__(OBJECT);     \
+		__ctext_FREE__(OBJECT);      \
 
 #endif
