@@ -1,18 +1,33 @@
 #include "libctext.h"
 
 int main(int argc, char *argv[]) {
-	new_STR(string, "Valor");
-	string.set("oioi");
-	string.get();
-	string.ltrim();
-	string.rtrim();
-	string.trim();
-	string.clear();
-	string.add("oioi");	
+	new_STR(string, "Willian");
 
-	printf("----\n");
-	string.len();
+	printf("-> initial: ");
 	string.print();
-	string.free();
 
+	printf("-> set:     |%s|\n", string.set("     willian      donadelli  o       lindo  "));
+
+//	printf("-> get:     |%s|\n", string.get());
+
+//	printf("-> ltrim:   |%s|\n", string.ltrim());
+
+//	printf("-> rtrim:   |%s|\n", string.rtrim());
+
+//	printf("-> trim:    |%s|\n", string.trim());
+
+	printf("-> clear:   |%s|\n", string.clear());
+
+	printf("-> add:     |%s|\n", string.add(" linduuuuu"));
+
+	printf("-> len:     %d\n", string.len());
+
+	printf("-> print:   ");
+	string.print();
+
+	printf("-> free: ");
+	string.free();
+	string.print();
+
+	exit(0);
 }

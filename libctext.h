@@ -225,20 +225,22 @@ SOFTWARE.
 /*-----------------------------------------------------------------------------
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
-	#define new_STR(OBJECT, STRING) \
-                                   \
-		ctextObject OBJECT;	        \
-		OBJECT._string = NULL;       \
-                                   \
-		__CTEXT_SET__(OBJECT);       \
-		__CTEXT_GET__(OBJECT);       \
-		__CTEXT_LTRIM__(OBJECT);     \
-		__CTEXT_RTRIM__(OBJECT);     \
-		__CTEXT_TRIM__(OBJECT);      \
-		__CTEXT_CLEAR__(OBJECT);     \
-		__CTEXT_ADD__(OBJECT);       \
-		__CTEXT_LEN__(OBJECT);       \
-		__CTEXT_PRINT__(OBJECT);     \
-		__CTEXT_FREE__(OBJECT);      \
+	#define new_STR(OBJECT, STRING)              \
+                                                \
+		ctextObject OBJECT;	                     \
+		OBJECT._string = NULL;                    \
+                                                \
+		__CTEXT_SET__(OBJECT);                    \
+		__CTEXT_GET__(OBJECT);                    \
+		__CTEXT_LTRIM__(OBJECT);                  \
+		__CTEXT_RTRIM__(OBJECT);                  \
+		__CTEXT_TRIM__(OBJECT);                   \
+		__CTEXT_CLEAR__(OBJECT);                  \
+		__CTEXT_ADD__(OBJECT);                    \
+		__CTEXT_LEN__(OBJECT);                    \
+		__CTEXT_PRINT__(OBJECT);                  \
+		__CTEXT_FREE__(OBJECT);                   \
+                                                \
+		OBJECT.set(STRING == NULL ? "" : STRING); \
 
 #endif
