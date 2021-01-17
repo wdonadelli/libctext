@@ -1,7 +1,75 @@
 #include "libctext.h"
 
+typedef struct
+{
+	unsigned int isLower: 1;
+	unsigned int isUpper: 1;
+	char lower;
+	char upper;
+} _structChar;
+
+
+static void _case(char vChar, _structChar *sChar) {
+
+	/* variáveis locais e valores iniciais */
+	char upper[] = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ";
+	char lower[] = "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ";
+	sChar->isLower = 0;
+	sChar->isUpper = 0;
+	sChar->lower = vChar;
+	sChar->upper = vChar;
+
+	/* verificando casos */
+	if (vChar >= 65 && vChar <= 90) {
+		sChar->lower = tolower(vChar);
+		sChar->isUpper = 1;
+		return;
+	} else if (vChar >= 97 && vChar <= 122) {
+		sChar->upper = toupper(vChar);
+		sChar->isLower = 1;
+		return;
+	} else {
+		for (int i = 0; i < strlen(upper); i++) {
+			if (upper[i] == vChar) {
+				sChar->lower = lower[i];
+				sChar->isUpper = 1;
+				return;
+			} else if (lower[i] == vChar) {
+				sChar->upper = upper[i];
+				sChar->isLower = 1;
+				return;
+			}
+		}
+	}
+	return;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 char *__ctext_set__ (ctextObject *self, char *str)
 {
+	for (int i = 192; i < 256; i++) printf("----\n%d = %c\n", i, i);
+
+
+
 	/* definir apenas se o valor de str for diferente de NULL */
 	if (str != NULL) {
 
@@ -86,13 +154,29 @@ char *__ctext_clear__ (ctextObject *self)
 	self->trim();
 
 	/* definindo variáveis temporárias e um identificador */
-/*	char *left;
-	char *right;
-	left  = self->_string;
-	right = self->_string;*/	
+	char *temp;
+	char str[(strlen(self->_string)+1)];
+	int  space;
+	temp  = self->_string;
+	space = 0;
+	strcpy(str, "");
 
+	while (*temp) {
+		if (*temp > 32) {
+			/* se não for vazio, adicionar */
+			str[strlen(str)+1] = '\0';
+			str[strlen(str)]   = temp[0];
+			space = 0;
+		} else if (space == 0){
+			/* se for vazio, mas o anterior não, adcionar */
+			str[strlen(str)+1] = '\0';
+			str[strlen(str)] = temp[0];
+			space = 1;
+		}
+		temp++;
+	}
 
-	return self->get();
+	return self->set(str);
 }
 /*----------------------------------------------------------------------------*/
 
@@ -123,6 +207,109 @@ char *__ctext_add__ (ctextObject *self, char *str)
 
 	return self->get();
 }
+/*----------------------------------------------------------------------------*/
+
+char *__ctext_lower__ (ctextObject *self)
+{
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
+	/* definindo variável temporária e um contador*/
+	char *temp;
+	char str[(strlen(self->_string)+1)];
+	temp = self->_string;
+	strcpy(str, "");
+
+	_structChar schar;
+
+
+	/* alterando caixa */
+	while (*temp) {
+	
+		_case(temp[0], &schar);
+		
+		printf("--------é fantástico\nLower/Upper: %d/%d | lower/upper: %c/%c\n", schar.isLower, schar.isUpper, 201, schar.upper);
+		
+	
+		str[strlen(str)+1] = '\0';
+		str[strlen(str)]   = tolower(temp[0]);
+		temp++;
+	}
+
+	return self->set(str);
+}
+/*----------------------------------------------------------------------------*/
+
+char *__ctext_upper__ (ctextObject *self)
+{
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
+	/* definindo variável temporária e um contador*/
+	char *temp;
+	char str[(strlen(self->_string)+1)];
+	temp = self->_string;
+	strcpy(str, "");
+
+	/* alterando caixa */
+	while (*temp) {
+		str[strlen(str)+1] = '\0';
+		str[strlen(str)]   = toupper(temp[0]);
+		temp++;
+	}
+
+	return self->set(str);
+}
+/*----------------------------------------------------------------------------*/
+
+char *__ctext_title__ (ctextObject *self)
+{
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
+	/* definindo variável temporária e um contador*/
+	char *temp;
+	char str[(strlen(self->_string)+1)];
+	int  space;
+	temp = self->_string;
+	strcpy(str, "");
+	space = 1;
+
+	/* alterando caixa */
+	while (*temp) {
+		str[strlen(str)+1] = '\0';
+		str[strlen(str)]   = space == 0 ? tolower(temp[0]) : toupper(temp[0]);
+		space = *temp <= 32 ? 1 : 0;
+		temp++;
+	}
+
+	return self->set(str);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*----------------------------------------------------------------------------*/
 
 int __ctext_len__ (ctextObject *self)

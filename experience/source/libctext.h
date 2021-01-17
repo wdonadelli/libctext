@@ -44,8 +44,9 @@ SOFTWARE.
 -----------------------------------------------------------------------------*/
 	#include <stdio.h>
 	#include <stdlib.h>
-	#include <stdarg.h>
 	#include <string.h>
+	#include <ctype.h>
+	#include <locale.h>
 
 /*-----------------------------------------------------------------------------
 	Macros de respostas:
@@ -171,16 +172,44 @@ SOFTWARE.
 		}                                     \
 		SELF.add = __ctext_add__##SELF;       \
 
+/*-----------------------------------------------------------------------------
+	__ctext_lower__ ()
+		Caixa baixa
+-----------------------------------------------------------------------------*/
+	char *__ctext_lower__ (ctextObject *self);
 
+	#define __CTEXT_LOWER__(SELF)          \
+		char *__ctext_lower__##SELF ()      \
+		{                                   \
+			return __ctext_lower__(&SELF);   \
+		}                                   \
+		SELF.lower = __ctext_lower__##SELF; \
 
-/*
-		int (*lower)();
-		int (*upper)();
-		int (*title)();
-*/
+/*-----------------------------------------------------------------------------
+	__ctext_upper__ ()
+		Caixa alta
+-----------------------------------------------------------------------------*/
+	char *__ctext_upper__ (ctextObject *self);
 
+	#define __CTEXT_UPPER__(SELF)          \
+		char *__ctext_upper__##SELF ()      \
+		{                                   \
+			return __ctext_upper__(&SELF);   \
+		}                                   \
+		SELF.upper = __ctext_upper__##SELF; \
 
+/*-----------------------------------------------------------------------------
+	__ctext_title__ ()
+		Primeira maiúscula apenas
+-----------------------------------------------------------------------------*/
+	char *__ctext_title__ (ctextObject *self);
 
+	#define __CTEXT_TITLE__(SELF)          \
+		char *__ctext_title__##SELF ()      \
+		{                                   \
+			return __ctext_title__(&SELF);   \
+		}                                   \
+		SELF.title = __ctext_title__##SELF; \
 
 /*-----------------------------------------------------------------------------
 	__ctext_len__ ()
@@ -226,7 +255,7 @@ SOFTWARE.
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
 	#define new_STR(OBJECT, STRING)              \
-                                                \
+      setlocale(LC_ALL, "");                                          \
 		ctextObject OBJECT;	                     \
 		OBJECT._string = NULL;                    \
                                                 \
@@ -237,6 +266,9 @@ SOFTWARE.
 		__CTEXT_TRIM__(OBJECT);                   \
 		__CTEXT_CLEAR__(OBJECT);                  \
 		__CTEXT_ADD__(OBJECT);                    \
+		__CTEXT_LOWER__(OBJECT);                  \
+		__CTEXT_UPPER__(OBJECT);                  \
+		__CTEXT_TITLE__(OBJECT);                  \
 		__CTEXT_LEN__(OBJECT);                    \
 		__CTEXT_PRINT__(OBJECT);                  \
 		__CTEXT_FREE__(OBJECT);                   \
