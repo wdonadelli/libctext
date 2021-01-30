@@ -1,74 +1,40 @@
 #include "libctext.h"
 
-typedef struct
+
+static char _ctext_case(char value, int type)
+/* Devolve a caixa solicitada do caractere, type: 0 lowercase, 1 uppercase */
 {
-	unsigned int isLower: 1;
-	unsigned int isUpper: 1;
-	char lower;
-	char upper;
-} _structChar;
-
-
-static void _case(char vChar, _structChar *sChar) {
-
 	/* variáveis locais e valores iniciais */
-	char upper[] = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ";
-	char lower[] = "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ";
-	sChar->isLower = 0;
-	sChar->isUpper = 0;
-	sChar->lower = vChar;
-	sChar->upper = vChar;
+	char _upper[] = "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞŸ";
+	char _lower[] = "àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ";
+	char *upper   = _upper;
+	char *lower   = _lower;
 
-	/* verificando casos */
-	if (vChar >= 65 && vChar <= 90) {
-		sChar->lower = tolower(vChar);
-		sChar->isUpper = 1;
-		return;
-	} else if (vChar >= 97 && vChar <= 122) {
-		sChar->upper = toupper(vChar);
-		sChar->isLower = 1;
-		return;
-	} else {
-		for (int i = 0; i < strlen(upper); i++) {
-			if (upper[i] == vChar) {
-				sChar->lower = lower[i];
-				sChar->isUpper = 1;
-				return;
-			} else if (lower[i] == vChar) {
-				sChar->upper = upper[i];
-				sChar->isLower = 1;
-				return;
+	/* verificando tabelas */
+	if (value >= 0 && value <= 255) {/* tabela ASCII (padrão) */
+		value = type == 0 ? tolower(value) : toupper(value);
+	} else { /* verificação manual (latim) */
+		while (*upper && *lower) {
+			if (type == 0 && value == *upper) {
+				value = lower[0];
+				break;
+			} else if (type != 0 && value == *lower) {
+				value = upper[0];
+				break;
 			}
+			upper++;
+			lower++;
 		}
 	}
-	return;
+
+	return value;
 }
+/*----------------------------------------------------------------------------*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
 char *__ctext_set__ (ctextObject *self, char *str)
 {
-	for (int i = 192; i < 256; i++) printf("----\n%d = %c\n", i, i);
-
-
 
 	/* definir apenas se o valor de str for diferente de NULL */
 	if (str != NULL) {
@@ -103,13 +69,12 @@ char *__ctext_ltrim__ (ctextObject *self)
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return self->get();}
 
-	/* definindo variável temporária */
-	char *temp;
-	temp = self->_string;
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
 
 	/* buscando valores imprimíveis a partir do início */
 	while (*temp) {
-		if (*temp > 32) {break;} else {temp++;}
+		if (*temp < 0 || *temp > 32) {break;} else {temp++;}
 	}
 
 	return self->set(temp);
@@ -121,14 +86,12 @@ char *__ctext_rtrim__ (ctextObject *self)
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return self->get();}
 
-	/* definindo variável temporária e um contador*/
-	char *temp;
-	int   count;
-	temp  = self->_string;
-	count = strlen(temp);
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
+	int  count = strlen(temp);
 
 	/* acrescentando nulos ao final se valor não imprimível */
-	while (count > 0 && temp[count-1] <= 32) {
+	while (count > 0 && temp[count-1] >= 0 && temp[count-1] <= 32) {
 		temp[count-1] = '\0';
 		count = strlen(temp);
 	}
@@ -153,24 +116,22 @@ char *__ctext_clear__ (ctextObject *self)
 	/* pré-requisito */
 	self->trim();
 
-	/* definindo variáveis temporárias e um identificador */
-	char *temp;
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
+	int  space = 0;
 	char str[(strlen(self->_string)+1)];
-	int  space;
-	temp  = self->_string;
-	space = 0;
 	strcpy(str, "");
 
 	while (*temp) {
-		if (*temp > 32) {
+		if (*temp > 32 || *temp < 0) {
 			/* se não for vazio, adicionar */
 			str[strlen(str)+1] = '\0';
 			str[strlen(str)]   = temp[0];
 			space = 0;
 		} else if (space == 0){
-			/* se for vazio, mas o anterior não, adcionar */
+			/* se for vazio, mas o anterior não, adicionar espaço */
 			str[strlen(str)+1] = '\0';
-			str[strlen(str)] = temp[0];
+			str[strlen(str)] = ' ';
 			space = 1;
 		}
 		temp++;
@@ -182,9 +143,8 @@ char *__ctext_clear__ (ctextObject *self)
 
 char *__ctext_add__ (ctextObject *self, char *str)
 {
-	/* definindo variável temporária */
-	char *temp;
-	temp = self->_string;
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
 
 	/* definir apenas se o valor de str for diferente de NULL */
 	if (str != NULL) {
@@ -214,29 +174,15 @@ char *__ctext_lower__ (ctextObject *self)
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return self->get();}
 
-	/* definindo variável temporária e um contador*/
-	char *temp;
-	char str[(strlen(self->_string)+1)];
-	temp = self->_string;
-	strcpy(str, "");
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
 
-	_structChar schar;
-
-
-	/* alterando caixa */
 	while (*temp) {
-	
-		_case(temp[0], &schar);
-		
-		printf("--------é fantástico\nLower/Upper: %d/%d | lower/upper: %c/%c\n", schar.isLower, schar.isUpper, 201, schar.upper);
-		
-	
-		str[strlen(str)+1] = '\0';
-		str[strlen(str)]   = tolower(temp[0]);
+		temp[0] = _ctext_case(*temp, 0);
 		temp++;
 	}
 
-	return self->set(str);
+	return self->get();
 }
 /*----------------------------------------------------------------------------*/
 
@@ -245,20 +191,15 @@ char *__ctext_upper__ (ctextObject *self)
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return self->get();}
 
-	/* definindo variável temporária e um contador*/
-	char *temp;
-	char str[(strlen(self->_string)+1)];
-	temp = self->_string;
-	strcpy(str, "");
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
 
-	/* alterando caixa */
 	while (*temp) {
-		str[strlen(str)+1] = '\0';
-		str[strlen(str)]   = toupper(temp[0]);
+		*temp = _ctext_case(*temp, 1);
 		temp++;
 	}
 
-	return self->set(str);
+	return self->get();
 }
 /*----------------------------------------------------------------------------*/
 
@@ -267,37 +208,38 @@ char *__ctext_title__ (ctextObject *self)
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return self->get();}
 
-	/* definindo variável temporária e um contador*/
-	char *temp;
-	char str[(strlen(self->_string)+1)];
-	int  space;
-	temp = self->_string;
-	strcpy(str, "");
-	space = 1;
+	/* pré-requisito */
+	self->lower();
 
-	/* alterando caixa */
+	/* definindo variáveis locais*/
+	char *temp = self->_string;
+	int  empty = 1;
+	int  ascii = 1;
+
 	while (*temp) {
-		str[strlen(str)+1] = '\0';
-		str[strlen(str)]   = space == 0 ? tolower(temp[0]) : toupper(temp[0]);
-		space = *temp <= 32 ? 1 : 0;
+		if (*temp <= 32 && *temp >= 0) {
+			/* não imprimíveis */
+			empty = 1;
+			ascii = 1;
+		} else if (*temp > 32 && *temp <= 255 && empty == 1) {
+			/* não imprimíveis ascii (padão) */
+			*temp = _ctext_case(*temp, 1);
+			empty = 0;
+			ascii = 1;
+		} else if (empty == 1 && ascii == 1) {
+			/* primeiro byte */
+			*temp = _ctext_case(*temp, 1);
+			ascii = 0;
+		} else if (empty == 1 && ascii == 0) {
+			/* segundo byte */
+			*temp = _ctext_case(*temp, 1);
+			empty = 0;
+		}
 		temp++;
 	}
 
-	return self->set(str);
+	return self->get();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -314,7 +256,19 @@ char *__ctext_title__ (ctextObject *self)
 
 int __ctext_len__ (ctextObject *self)
 {
-	return self->_string == NULL ? 0 : strlen(self->_string);
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return 0;}
+
+	/* definindo variáveis locais*/
+	float len  = 0;
+	char *temp = self->_string;
+
+	while(*temp) {
+		len += (*temp >= 0 && *temp <= 255) ? 1 : 0.5;
+		temp++;
+	}
+
+	return (int)len;
 }
 
 /*----------------------------------------------------------------------------*/

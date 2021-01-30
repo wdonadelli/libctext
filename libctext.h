@@ -255,7 +255,7 @@ SOFTWARE.
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
 	#define new_STR(OBJECT, STRING)              \
-      setlocale(LC_ALL, "");                                          \
+      setlocale(LC_ALL, "portuguese");                                          \
 		ctextObject OBJECT;	                     \
 		OBJECT._string = NULL;                    \
                                                 \
