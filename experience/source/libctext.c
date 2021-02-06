@@ -124,12 +124,12 @@ char *__ctext_clear__ (ctextObject *self)
 
 	while (*temp) {
 		if (*temp > 32 || *temp < 0) {
-			/* se não for vazio, adicionar */
+			/* se não for vazio, adicionar caractere à variável str */
 			str[strlen(str)+1] = '\0';
 			str[strlen(str)]   = temp[0];
 			space = 0;
 		} else if (space == 0){
-			/* se for vazio, mas o anterior não, adicionar espaço */
+			/* se for vazio, mas o anterior não, adicionar espaço à variável str */
 			str[strlen(str)+1] = '\0';
 			str[strlen(str)] = ' ';
 			space = 1;
@@ -222,7 +222,7 @@ char *__ctext_title__ (ctextObject *self)
 			empty = 1;
 			ascii = 1;
 		} else if (*temp > 32 && *temp <= 255 && empty == 1) {
-			/* não imprimíveis ascii (padão) */
+			/* não imprimíveis ascii (padrão) */
 			*temp = _ctext_case(*temp, 1);
 			empty = 0;
 			ascii = 1;
@@ -240,17 +240,6 @@ char *__ctext_title__ (ctextObject *self)
 
 	return self->get();
 }
-
-
-
-
-
-
-
-
-
-
-
 
 /*----------------------------------------------------------------------------*/
 
