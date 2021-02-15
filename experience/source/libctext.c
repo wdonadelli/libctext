@@ -263,7 +263,7 @@ int __ctext_len__ (ctextObject *self)
 /*----------------------------------------------------------------------------*/
 void __ctext_print__ (ctextObject *self)
 {
-	printf("%s\n", (self->_string == NULL ? "" : self->_string));
+	puts(self->_string == NULL ? "" : self->_string);
 }
 
 /*----------------------------------------------------------------------------*/

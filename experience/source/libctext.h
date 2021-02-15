@@ -49,7 +49,7 @@ SOFTWARE.
 	#include <locale.h>
 
 /*-----------------------------------------------------------------------------
-	Macros de respostas:
+	Macros de respostas: FIXME pra que isso mesmo?
 -----------------------------------------------------------------------------*/
 	#define CTEXT_OK  0
 	#define CTEXT_ERR 1
