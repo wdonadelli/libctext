@@ -46,7 +46,7 @@ char *__ctext_set__ (ctextObject *self, char *str)
 
 		/* verificando problema na alocação da memória */
 		if (self->_string == NULL) {
-			printf("Memory allocation error!");
+			puts("Memory allocation error!");
 			exit(1);
 		}
 
@@ -156,7 +156,7 @@ char *__ctext_add__ (ctextObject *self, char *str)
 
 		/* verificando problema na alocação da memória */
 		if (self->_string == NULL) {
-			printf("Memory allocation error!");
+			puts("Memory allocation error!");
 			exit(1);
 		}
 
@@ -242,6 +242,103 @@ char *__ctext_title__ (ctextObject *self)
 }
 
 /*----------------------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int __ctext_input__ (ctextObject *self, char *msg)
+{
+
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return 1;}
+
+	/* definindo variáveis locais*/
+	char *temp;
+	char c;
+
+	/* alocando memória */
+	temp = malloc(1 * sizeof(char));
+
+	/* verificando problema na alocação da memória */
+	if (temp == NULL) {
+		puts("Memory allocation error!");
+		exit(1);
+	}
+
+	/* definindo valor inicial */
+	temp[0] = '\0';
+
+	/* exibindo a mensagem */
+	printf(msg);
+
+	/* obtendo caracteres */
+	while((c = fgetc(stdin)) != '\n') {
+
+		/* alocando memória */
+		temp = malloc((strlen(temp) + 2) * sizeof(char));
+
+		/* verificando problema na alocação da memória */
+		if (temp == NULL) {
+			puts("Memory allocation error!");
+			exit(1);
+		}
+
+		/* definindo valor */
+		temp[strlen(temp)] = '\0';
+		temp[(strlen(temp) - 1)] = c;
+		puts(temp);
+
+	}
+
+	/* definindo string */
+	self->set(temp);
+	
+	/* liberando memória */
+	free(temp);
+
+	return 0;
+}
+
+int __ctext_fget__ (ctextObject *self, char *file)
+{
+	return 1;
+}
+
+int __ctext_fset__ (ctextObject *self, char *file)
+{
+	return 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int __ctext_len__ (ctextObject *self)
 {

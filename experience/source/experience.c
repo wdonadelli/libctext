@@ -38,6 +38,30 @@ void set_action(ctextObject *var, char *pre, char *attr);
 /*----------------------------------------------------------------------------*/
 int main(int argc, char *argv[]) {
 
+
+	//teste
+	
+	new_STR(loko, "bunda");
+	loko.print();
+	loko.input("questão?\n");
+	loko.print();
+	loko.free();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	/* variáveis locais */
 	char input[81];   /* registra a entrada de dados do usuário */
 	int  menu = 1;    /* registra a opção de menu */
@@ -127,6 +151,13 @@ int main(int argc, char *argv[]) {
 				get_value("Press enter to continue...", input);
 				get_value("", input);
 				break;
+			case 13:
+				get_value("Enter message text:", input);
+				get_value("", input);
+				set_string(&att, input);
+				set_action(&act, "myString.input(", att.get());
+				set_string(&out, (myString.input(input) == 0 ? "0" : "1"));
+				break;
 		}
 
 	}
@@ -164,6 +195,9 @@ int get_menu(char *action, char *output)
 		"title",
 		"len",
 		"print",
+		"input",
+		"fget",
+		"fset",
 		NULL
 	};
 
@@ -196,15 +230,16 @@ int get_menu(char *action, char *output)
 /*----------------------------------------------------------------------------*/
 void get_value(char *msg, char *var) {
 	printf("%s %s %s", STYLE_QUESTION, msg, STYLE_GET_VALUE);
-	fgets(var, 80, stdin);
+	
+	fgets(var, 7, stdin);
 
-	if (var[0] == '\r') {
+	printf("tamanho: %ld, last: %c (%s)\n", strlen(var), var[strlen(var)-1], var);
+
+	if (var[0] == '\n') {printf(">string vazia\n");
 		var[0] = '\0';
-	} else if (var[strlen(var)-1] == '\r') {
+	} else if (var[strlen(var)-1] == '\n') {printf(">string com quebra\n");
 		var[strlen(var)-1] = '\0';
 	}
-
-
 	printf("%s", STYLE_DEFAULT);
 }
 

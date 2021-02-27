@@ -74,6 +74,10 @@ SOFTWARE.
 		char *(*upper)(); /* caixa alta */
 		char *(*title)(); /* caixa alta apenas na letras iniciais */
 
+		int  (*input)(); /* define uma string pela entrada padrão */
+		int  (*fget)();  /* define uma string a partir de um arquivo */
+		int  (*fset)();  /* atribui a string para um arquivo */
+
 		int   (*len)();   /* devolve o tamanho da string */
 		void  (*print)(); /* imprimi a string na tela */
 		void  (*free)();  /* libera memória */
@@ -212,6 +216,52 @@ SOFTWARE.
 		SELF.title = __ctext_title__##SELF; \
 
 /*-----------------------------------------------------------------------------
+	__ctext_input__ ()
+		Define o valor da string a partir da entrada padrão
+		msg: Texto a ser exibido para obtenção dos dados
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_input__ (ctextObject *self, char *msg);
+
+	#define __CTEXT_INPUT__(SELF)              \
+		int __ctext_input__##SELF (char *msg) \
+		{                                     \
+			return __ctext_input__(&SELF, msg);  \
+		}                                     \
+		SELF.input = __ctext_input__##SELF;       \
+
+
+/*-----------------------------------------------------------------------------
+	__ctext_fget__ ()
+		Define o valor da string a partir do conteúdo do arquivo de texto
+		file: Endereço do arquivo
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_fget__ (ctextObject *self, char *file);
+
+	#define __CTEXT_FGET__(SELF)              \
+		int __ctext_fget__##SELF (char *file) \
+		{                                     \
+			return __ctext_fget__(&SELF, file);  \
+		}                                     \
+		SELF.fget = __ctext_fget__##SELF;       \
+
+/*-----------------------------------------------------------------------------
+	__ctext_fset__ ()
+		Atribui o valor da string a um arquivo
+		file: Endereço do arquivo
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_fset__ (ctextObject *self, char *file);
+
+	#define __CTEXT_FSET__(SELF)              \
+		int __ctext_fset__##SELF (char *file) \
+		{                                     \
+			return __ctext_fset__(&SELF, file);  \
+		}                                     \
+		SELF.fset = __ctext_fset__##SELF;       \
+
+/*-----------------------------------------------------------------------------
 	__ctext_len__ ()
 		Retorna o tamanho da String do "objeto"
 -----------------------------------------------------------------------------*/
@@ -251,11 +301,11 @@ SOFTWARE.
 		}                                 \
 		SELF.free = __ctext_free__##SELF; \
 
+
 /*-----------------------------------------------------------------------------
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
 	#define new_STR(OBJECT, STRING)              \
-      setlocale(LC_ALL, "portuguese");                                          \
 		ctextObject OBJECT;	                     \
 		OBJECT._string = NULL;                    \
                                                 \
@@ -269,6 +319,9 @@ SOFTWARE.
 		__CTEXT_LOWER__(OBJECT);                  \
 		__CTEXT_UPPER__(OBJECT);                  \
 		__CTEXT_TITLE__(OBJECT);                  \
+		__CTEXT_INPUT__(OBJECT);                  \
+		__CTEXT_FGET__(OBJECT);                   \
+		__CTEXT_FSET__(OBJECT);                   \
 		__CTEXT_LEN__(OBJECT);                    \
 		__CTEXT_PRINT__(OBJECT);                  \
 		__CTEXT_FREE__(OBJECT);                   \
