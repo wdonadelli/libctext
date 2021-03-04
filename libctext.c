@@ -1,5 +1,15 @@
 #include "libctext.h"
 
+/* Mensagem de erro na alocação de memória */
+#define MEMORY_ERROR "Memory allocation error!"
+
+/* Checa a memória alocada e sai em caso de erro */
+#define CHECK_MEMORY(VAR) if (VAR == NULL) {puts(MEMORY_ERROR); exit(1);}
+
+/* Aloca memória de caracteres e checa o resultado */
+#define STR_SET_MEMORY(VAR,LEN) \
+	VAR = malloc((LEN + 1) * sizeof(char)); \
+	CHECK_MEMORY(VAR)
 
 static char _ctext_case(char value, int type)
 /* Devolve a caixa solicitada do caractere, type: 0 lowercase, 1 uppercase */
@@ -40,15 +50,7 @@ char *__ctext_set__ (ctextObject *self, char *str)
 	if (str != NULL) {
 
 		/* alocando memória */
-		self->_string = malloc(
-			(strlen(str) + 1) * sizeof(char)
-		);
-
-		/* verificando problema na alocação da memória */
-		if (self->_string == NULL) {
-			puts("Memory allocation error!");
-			exit(1);
-		}
+		STR_SET_MEMORY(self->_string, strlen(str));
 
 		/* definindo valor de _string */
 		strcpy(self->_string, str);
@@ -150,15 +152,7 @@ char *__ctext_add__ (ctextObject *self, char *str)
 	if (str != NULL) {
 
 		/* alocando memória */
-		self->_string = malloc(
-			(strlen(str) + strlen(temp) + 1) * sizeof(char)
-		);
-
-		/* verificando problema na alocação da memória */
-		if (self->_string == NULL) {
-			puts("Memory allocation error!");
-			exit(1);
-		}
+		STR_SET_MEMORY(self->_string, strlen(str) + strlen(temp));
 
 		/* definindo valor de _string */
 		strcpy(self->_string, temp);
@@ -240,105 +234,83 @@ char *__ctext_title__ (ctextObject *self)
 
 	return self->get();
 }
-
 /*----------------------------------------------------------------------------*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int __ctext_input__ (ctextObject *self, char *msg)
 {
-
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return 1;}
 
-	/* definindo variáveis locais*/
-	char *temp;
+	/* definindo variáveis locais e valores iniciais */
+	char temp[2];
 	char c;
-
-	/* alocando memória */
-	temp = malloc(1 * sizeof(char));
-
-	/* verificando problema na alocação da memória */
-	if (temp == NULL) {
-		puts("Memory allocation error!");
-		exit(1);
-	}
-
-	/* definindo valor inicial */
-	temp[0] = '\0';
+	strcpy(temp, "");
 
 	/* exibindo a mensagem */
-	printf(msg);
+	printf("%s", msg);
 
 	/* obtendo caracteres */
+	self->set("");
 	while((c = fgetc(stdin)) != '\n') {
-
-		/* alocando memória */
-		temp = malloc((strlen(temp) + 2) * sizeof(char));
-
-		/* verificando problema na alocação da memória */
-		if (temp == NULL) {
-			puts("Memory allocation error!");
-			exit(1);
-		}
-
-		/* definindo valor */
-		temp[strlen(temp)] = '\0';
-		temp[(strlen(temp) - 1)] = c;
-		puts(temp);
-
+		temp[0] = c;
+		self->add(temp);
 	}
-
-	/* definindo string */
-	self->set(temp);
-	
-	/* liberando memória */
-	free(temp);
 
 	return 0;
 }
+/*----------------------------------------------------------------------------*/
 
 int __ctext_fget__ (ctextObject *self, char *file)
 {
-	return 1;
+	/* verificando memória alocada */
+	if (self->_string == NULL || file == NULL) {return 1;}
+
+	/* definindo variáveis locais e valores iniciais */
+	FILE *path;
+	char temp[2];
+	char c;
+	strcpy(temp, "");
+
+	/* Tentando abri o arquivo para leitura */
+	if ((path = fopen(file, "r")) == NULL) {return 2;}
+
+	/* obtendo caracteres */
+	self->set("");
+	while((c = fgetc(path)) != EOF) {
+		if (ferror(path)) {return 3;}
+		temp[0] = c;
+		self->add(temp);
+	}
+
+	/* fechando arquivo */
+	if (fclose(path) != 0) {return 4;};
+	
+	return 0;
 }
+/*----------------------------------------------------------------------------*/
 
 int __ctext_fset__ (ctextObject *self, char *file)
 {
-	return 1;
+		/* verificando memória alocada */
+	if (self->_string == NULL || file == NULL) {return 1;}
+
+	/* definindo variáveis locais e valores iniciais */
+	FILE *path;
+	int check;
+
+	/* Tentando abri o arquivo para leitura */
+	if ((path = fopen(file, "w")) == NULL) {return 2;}
+
+	/* escrevendo caracteres */
+	check = fputs(self->_string, path);
+	if (check < 0 || check == EOF) {return 3;}
+
+	/* fechando arquivo */
+	if (fclose(path) != 0) {return 4;};
+
+	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/*----------------------------------------------------------------------------*/
 
 int __ctext_len__ (ctextObject *self)
 {
