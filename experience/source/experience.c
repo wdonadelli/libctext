@@ -10,12 +10,11 @@
 
 /*-- Frases --*/
 #define INPUT_INITIAL STYLE_PROMPT "Initial value: " STYLE_VALUE
-#define INPUT_USER    STYLE_DEFAULT "\n: "
+#define INPUT_USER    STYLE_DEFAULT "\n>"
 #define INPUT_SET     STYLE_PROMPT "New value: " STYLE_VALUE
 #define INPUT_ADD     STYLE_PROMPT "Addition value: " STYLE_VALUE
-#define INPUT_FILE    STYLE_PROMPT "File name: " STYLE_VALUE
+#define INPUT_FILE    STYLE_PROMPT "File path: " STYLE_VALUE
 #define INPUT_INPUT   STYLE_PROMPT "Message: " STYLE_VALUE
-
 
 /*-- Protótipos --*/
 void options();
@@ -34,19 +33,17 @@ int main(int argc, char *argv[]) {
 	printf("%s%48s%32s%s\n\n", STYLE_TITLE, "LIBCTEXT EXAMPLE", " ", STYLE_DEFAULT);
 
 	/* valor inicial */	
-	data.input(INPUT_INITIAL);
+	data.read(INPUT_INITIAL);
 	new_STR(myString, data.get());
 	printf("%snew_STR(myString, %s\"%s\"%s);\n",
 		STYLE_EXIT, STYLE_VALUE, data.get(), STYLE_EXIT
 	);
-	
 
 	/* looping */
 	while (!quit) {
-		data.input(INPUT_USER);
+		data.read(INPUT_USER);
 		data.clear();
 		data.lower();
-
 
 		/* checando menu */
 		if (
@@ -94,11 +91,11 @@ int main(int argc, char *argv[]) {
 			printf("%smyString.len();\n%s%d ",
 				STYLE_EXIT, STYLE_VALUE, myString.len()
 			);
-		} else if (strcmp(data.get(), "print") == 0) {
-			printf("%smyString.print();\n", STYLE_EXIT);
-			myString.print();
+		} else if (strcmp(data.get(), "write") == 0) {
+			printf("%smyString.write();\n", STYLE_EXIT);
+			printf("%s%d", STYLE_VALUE, myString.write());
 		} else if (strcmp(data.get(), "set") == 0) {
-			data.input(INPUT_SET);
+			data.read(INPUT_SET);
 			printf("%smyString.set(%s\"%s\"%s);\n%s\"%s\"",
 				STYLE_EXIT, 
 				STYLE_VALUE,
@@ -108,7 +105,7 @@ int main(int argc, char *argv[]) {
 				myString.set(data.get())
 			);
 		} else if (strcmp(data.get(), "add") == 0) {
-			data.input(INPUT_ADD);
+			data.read(INPUT_ADD);
 			printf("%smyString.add(%s\"%s\"%s);\n%s\"%s\"",
 				STYLE_EXIT, 
 				STYLE_VALUE,
@@ -117,46 +114,52 @@ int main(int argc, char *argv[]) {
 				STYLE_VALUE,
 				myString.add(data.get())
 			);
-		} else if (strcmp(data.get(), "input") == 0) {
+		} else if (strcmp(data.get(), "read") == 0) {
 			int check;
-			data.input(INPUT_INPUT);
-			printf("%smyString.input(%s\"%s\"%s);\n%s",
+			data.read(INPUT_INPUT);
+			printf("%smyString.read(%s\"%s\"%s);\n%s",
 				STYLE_EXIT, 
 				STYLE_VALUE,
 				data.get(),
 				STYLE_EXIT,
 				STYLE_DEFAULT
 			);
-			check = myString.input(data.get());
+			check = myString.read(data.get());
 			printf("%s%d", STYLE_VALUE, check);
-		} else if (strcmp(data.get(), "fget") == 0) {
-			data.input(INPUT_FILE);
-			printf("%smyString.fget(%s\"%s\"%s);\n%s%d",
+		} else if (strcmp(data.get(), "fwrite") == 0) {
+			data.read(INPUT_FILE);
+			printf("%smyString.fwrite(%s\"%s\"%s);\n%s%d",
 				STYLE_EXIT, 
 				STYLE_VALUE,
 				data.get(),
 				STYLE_EXIT,
 				STYLE_VALUE,
-				myString.fget(data.get())
+				myString.fwrite(data.get())
 			);
-		} else if (strcmp(data.get(), "fset") == 0) {
-			data.input(INPUT_FILE);
-			printf("%smyString.fset(%s\"%s\"%s);\n%s%d",
+		} else if (strcmp(data.get(), "fread") == 0) {
+			data.read(INPUT_FILE);
+			printf("%smyString.fread(%s\"%s\"%s);\n%s%d",
 				STYLE_EXIT, 
 				STYLE_VALUE,
 				data.get(),
 				STYLE_EXIT,
 				STYLE_VALUE,
-				myString.fset(data.get())
+				myString.fread(data.get())
 			);
 		}
 		else {
 			int j = 0;
 			char *methods[] = {
-				"free",
 				"get",
 				"set",
 				"add",
+
+				"write",
+				"read",
+
+				"fwrite",
+				"fread",
+
 				"ltrim",
 				"rtrim",
 				"trim",
@@ -164,11 +167,9 @@ int main(int argc, char *argv[]) {
 				"lower",
 				"upper",
 				"title",
+
 				"len",
-				"print",
-				"input",
-				"fget",
-				"fset",
+				"free",
 				NULL
 			};
 			printf(STYLE_VALUE);

@@ -65,21 +65,24 @@ SOFTWARE.
 		/*-- Métodos/Atributos acessíveis ao usuário --*/
 		char *(*set)();   /* define uma string */
 		char *(*get)();   /* retorna a string */
+		char *(*add)();   /* acrescenta string */
+
+		int  (*write)();  /* escreve a string na entrada padrão */
+		int  (*read)();   /* lê e define a string pela entrada padrão */
+
+		int  (*fwrite)(); /* escreve a string em um arquivo */
+		int  (*fread)();  /* Lê um arquivo e define a string pelo seu conteúdo */
+
 		char *(*ltrim)(); /* apara o lado esquerdo */
 		char *(*rtrim)(); /* apara o lado direito */
 		char *(*trim)();  /* apara ambos os lados */
 		char *(*clear)(); /* remove os espaços extras */
-		char *(*add)();   /* acrescenta string */
 		char *(*lower)(); /* caixa baixa */
 		char *(*upper)(); /* caixa alta */
 		char *(*title)(); /* caixa alta apenas na letras iniciais */
 
-		int  (*input)(); /* define uma string pela entrada padrão */
-		int  (*fget)();  /* define uma string a partir de um arquivo */
-		int  (*fset)();  /* atribui a string para um arquivo */
 
 		int   (*len)();   /* devolve o tamanho da string */
-		void  (*print)(); /* imprimi a string na tela */
 		void  (*free)();  /* libera memória */
 	} ctextObject;
 
@@ -109,6 +112,79 @@ SOFTWARE.
 			return __ctext_get__(&SELF); \
 		}                               \
 		SELF.get = __ctext_get__##SELF; \
+
+/*-----------------------------------------------------------------------------
+	__ctext_add__ ()
+		Acrescenta a String ao fim
+		str: string a ser adicionar ao final
+-----------------------------------------------------------------------------*/
+	char *__ctext_add__ (ctextObject *self, char *str);
+
+	#define __CTEXT_ADD__(SELF)              \
+		char *__ctext_add__##SELF (char *str) \
+		{                                     \
+			return __ctext_add__(&SELF, str);  \
+		}                                     \
+		SELF.add = __ctext_add__##SELF;       \
+
+/*-----------------------------------------------------------------------------
+	__ctext_write__ ()
+		Imprime na tela a string
+		Retorna um número diferente de zero se ocorreu um erro
+-----------------------------------------------------------------------------*/
+	int __ctext_write__ (ctextObject *self);
+
+	#define __CTEXT_WRITE__(SELF)          \
+		int __ctext_write__##SELF ()       \
+		{                                   \
+			return __ctext_write__(&SELF);          \
+		}                                   \
+		SELF.write = __ctext_write__##SELF; \
+
+/*-----------------------------------------------------------------------------
+	__ctext_read__ ()
+		Define o valor da string a partir da entrada padrão
+		msg: Texto a ser exibido para obtenção dos dados
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_read__ (ctextObject *self, char *msg);
+
+	#define __CTEXT_READ__(SELF)              \
+		int __ctext_read__##SELF (char *msg) \
+		{                                     \
+			return __ctext_read__(&SELF, msg);  \
+		}                                     \
+		SELF.read = __ctext_read__##SELF;       \
+
+/*-----------------------------------------------------------------------------
+	__ctext_fwrite__ ()
+		Atribui o valor da string a um arquivo
+		file: Endereço do arquivo
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_fwrite__ (ctextObject *self, char *file);
+
+	#define __CTEXT_FWRITE__(SELF)              \
+		int __ctext_fwrite__##SELF (char *file) \
+		{                                     \
+			return __ctext_fwrite__(&SELF, file);  \
+		}                                     \
+		SELF.fwrite = __ctext_fwrite__##SELF;       \
+
+/*-----------------------------------------------------------------------------
+	__ctext_fread__ ()
+		Define o valor da string a partir do conteúdo do arquivo de texto
+		file: Endereço do arquivo
+		Retorna um número diferente de zero se um erro ocorreu
+-----------------------------------------------------------------------------*/
+	int __ctext_fread__ (ctextObject *self, char *file);
+
+	#define __CTEXT_FREAD__(SELF)              \
+		int __ctext_fread__##SELF (char *file) \
+		{                                     \
+			return __ctext_fread__(&SELF, file);  \
+		}                                     \
+		SELF.fread = __ctext_fread__##SELF;       \
 
 /*-----------------------------------------------------------------------------
 	__ctext_ltrim__ ()
@@ -163,20 +239,6 @@ SOFTWARE.
 		SELF.clear = __ctext_clear__##SELF; \
 
 /*-----------------------------------------------------------------------------
-	__ctext_add__ ()
-		Acrescenta a String ao fim
-		str: string a ser adicionar ao final
------------------------------------------------------------------------------*/
-	char *__ctext_add__ (ctextObject *self, char *str);
-
-	#define __CTEXT_ADD__(SELF)              \
-		char *__ctext_add__##SELF (char *str) \
-		{                                     \
-			return __ctext_add__(&SELF, str);  \
-		}                                     \
-		SELF.add = __ctext_add__##SELF;       \
-
-/*-----------------------------------------------------------------------------
 	__ctext_lower__ ()
 		Caixa baixa
 -----------------------------------------------------------------------------*/
@@ -216,52 +278,6 @@ SOFTWARE.
 		SELF.title = __ctext_title__##SELF; \
 
 /*-----------------------------------------------------------------------------
-	__ctext_input__ ()
-		Define o valor da string a partir da entrada padrão
-		msg: Texto a ser exibido para obtenção dos dados
-		Retorna um número diferente de zero se um erro ocorreu
------------------------------------------------------------------------------*/
-	int __ctext_input__ (ctextObject *self, char *msg);
-
-	#define __CTEXT_INPUT__(SELF)              \
-		int __ctext_input__##SELF (char *msg) \
-		{                                     \
-			return __ctext_input__(&SELF, msg);  \
-		}                                     \
-		SELF.input = __ctext_input__##SELF;       \
-
-
-/*-----------------------------------------------------------------------------
-	__ctext_fget__ ()
-		Define o valor da string a partir do conteúdo do arquivo de texto
-		file: Endereço do arquivo
-		Retorna um número diferente de zero se um erro ocorreu
------------------------------------------------------------------------------*/
-	int __ctext_fget__ (ctextObject *self, char *file);
-
-	#define __CTEXT_FGET__(SELF)              \
-		int __ctext_fget__##SELF (char *file) \
-		{                                     \
-			return __ctext_fget__(&SELF, file);  \
-		}                                     \
-		SELF.fget = __ctext_fget__##SELF;       \
-
-/*-----------------------------------------------------------------------------
-	__ctext_fset__ ()
-		Atribui o valor da string a um arquivo
-		file: Endereço do arquivo
-		Retorna um número diferente de zero se um erro ocorreu
------------------------------------------------------------------------------*/
-	int __ctext_fset__ (ctextObject *self, char *file);
-
-	#define __CTEXT_FSET__(SELF)              \
-		int __ctext_fset__##SELF (char *file) \
-		{                                     \
-			return __ctext_fset__(&SELF, file);  \
-		}                                     \
-		SELF.fset = __ctext_fset__##SELF;       \
-
-/*-----------------------------------------------------------------------------
 	__ctext_len__ ()
 		Retorna o tamanho da String do "objeto"
 -----------------------------------------------------------------------------*/
@@ -273,20 +289,6 @@ SOFTWARE.
 			return __ctext_len__(&SELF); \
 		}                               \
 		SELF.len = __ctext_len__##SELF; \
-
-/*-----------------------------------------------------------------------------
-	__ctext_print__ ()
-		Imprime na tela a string
------------------------------------------------------------------------------*/
-	void __ctext_print__ (ctextObject *self);
-
-	#define __CTEXT_PRINT__(SELF)          \
-		void __ctext_print__##SELF ()       \
-		{                                   \
-			__ctext_print__(&SELF);          \
-		}                                   \
-		SELF.print = __ctext_print__##SELF; \
-
 
 /*-----------------------------------------------------------------------------
 	__ctext_free__ ()
@@ -301,7 +303,6 @@ SOFTWARE.
 		}                                 \
 		SELF.free = __ctext_free__##SELF; \
 
-
 /*-----------------------------------------------------------------------------
 	new_CSR () construtor da estrutura
 -----------------------------------------------------------------------------*/
@@ -311,19 +312,19 @@ SOFTWARE.
                                                 \
 		__CTEXT_SET__(OBJECT);                    \
 		__CTEXT_GET__(OBJECT);                    \
+		__CTEXT_ADD__(OBJECT);                    \
+		__CTEXT_WRITE__(OBJECT);                  \
+		__CTEXT_READ__(OBJECT);                   \
+		__CTEXT_FWRITE__(OBJECT);                 \
+		__CTEXT_FREAD__(OBJECT);                  \
 		__CTEXT_LTRIM__(OBJECT);                  \
 		__CTEXT_RTRIM__(OBJECT);                  \
 		__CTEXT_TRIM__(OBJECT);                   \
 		__CTEXT_CLEAR__(OBJECT);                  \
-		__CTEXT_ADD__(OBJECT);                    \
 		__CTEXT_LOWER__(OBJECT);                  \
 		__CTEXT_UPPER__(OBJECT);                  \
 		__CTEXT_TITLE__(OBJECT);                  \
-		__CTEXT_INPUT__(OBJECT);                  \
-		__CTEXT_FGET__(OBJECT);                   \
-		__CTEXT_FSET__(OBJECT);                   \
 		__CTEXT_LEN__(OBJECT);                    \
-		__CTEXT_PRINT__(OBJECT);                  \
 		__CTEXT_FREE__(OBJECT);                   \
                                                 \
 		OBJECT.set(STRING == NULL ? "" : STRING); \
