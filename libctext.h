@@ -37,7 +37,59 @@ SOFTWARE.
 
 #ifndef LIBRARY_CTEXT_H
 
+	/* -- Define a biblioteca -- */
 	#define LIBRARY_CTEXT_H
+
+	/* -- Define o nome do objeto -- */
+	#define CTEXT_MAIN_TYPE NewTextObject
+
+	/* -- Define os construtores dos métodos -- */
+
+	/*: Método com retorno e sem atributo */
+	#define CTEXT_NEW_TYPE_METHOD__(SELF, NAME, TYPE) \
+		TYPE __NewTextObject_##NAME##_##SELF () { \
+			return __NewTextObject_##NAME(&SELF); \
+		} \
+		SELF.NAME = __NewTextObject_##NAME##_##SELF;
+
+	/*: Método com retorno e com um atributo */
+	#define CTEXT_NEW_TYPE_ATTR_METHOD__(SELF, NAME, TYPE, ATYPE, ATTR) \
+		TYPE __NewTextObject_##NAME##_##SELF (ATYPE ATTR) { \
+			return __NewTextObject_##NAME(&SELF, ATTR); \
+		} \
+		SELF.NAME = __NewTextObject_##NAME##_##SELF;
+
+	/*: Método sem e sem atributo */
+	#define CTEXT_NEW_VOID_METHOD__(SELF, NAME) \
+		void __NewTextObject_##NAME##_##SELF () { \
+			__NewTextObject_##NAME(&SELF); \
+		} \
+		SELF.NAME = __NewTextObject_##NAME##_##SELF;
+
+	/* -- Define o construtor da estrutura/objeto */
+	#define new_STR(OBJECT, INITIAL) \
+		CTEXT_MAIN_TYPE OBJECT;	\
+\
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, set, char *, char *, str); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, get, char *); \
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, add, char *, char *, str); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, write, int); \
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, read, int, char *, msg); \
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, fwrite, int, char *, file); \
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, fread, int, char *, file); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, ltrim, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, rtrim, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, trim, char *);  \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, clear, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, lower, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, upper, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, title, char *); \
+		CTEXT_NEW_TYPE_METHOD__(OBJECT, len, long int); \
+		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, match, int, char *, str); \
+		CTEXT_NEW_VOID_METHOD__(OBJECT, free); \
+\
+		OBJECT._string = NULL; \
+		OBJECT.set(INITIAL == NULL ? "" : INITIAL); \
 
 /*-----------------------------------------------------------------------------
 	Bibliotecas necessárias: FIXME precisa de tudo isso mesmo?
@@ -49,12 +101,6 @@ SOFTWARE.
 	#include <locale.h>
 
 /*-----------------------------------------------------------------------------
-	Macros de respostas: FIXME pra que isso mesmo?
------------------------------------------------------------------------------*/
-	#define CTEXT_OK  0
-	#define CTEXT_ERR 1
-
-/*-----------------------------------------------------------------------------
 	Estrutura do objeto
 -----------------------------------------------------------------------------*/
 	typedef struct
@@ -63,270 +109,148 @@ SOFTWARE.
 		char *_string; /* registra a String */
 
 		/*-- Métodos/Atributos acessíveis ao usuário --*/
-		char *(*set)();   /* define uma string */
-		char *(*get)();   /* retorna a string */
-		char *(*add)();   /* acrescenta string */
+		char *(*set)();    /* define uma string */
+		char *(*get)();    /* retorna a string */
+		char *(*add)();    /* acrescenta string */
 
-		int  (*write)();  /* escreve a string na entrada padrão */
-		int  (*read)();   /* lê e define a string pela entrada padrão */
+		int  (*write)();   /* escreve a string na entrada padrão */
+		int  (*read)();    /* lê e define a string pela entrada padrão */
 
-		int  (*fwrite)(); /* escreve a string em um arquivo */
-		int  (*fread)();  /* Lê um arquivo e define a string pelo seu conteúdo */
+		int  (*fwrite)();  /* escreve a string em um arquivo */
+		int  (*fread)();   /* Lê um arquivo e define a string pelo seu conteúdo */
 
-		char *(*ltrim)(); /* apara o lado esquerdo */
-		char *(*rtrim)(); /* apara o lado direito */
-		char *(*trim)();  /* apara ambos os lados */
-		char *(*clear)(); /* remove os espaços extras */
-		char *(*lower)(); /* caixa baixa */
-		char *(*upper)(); /* caixa alta */
-		char *(*title)(); /* caixa alta apenas na letras iniciais */
+		char *(*ltrim)();  /* apara o lado esquerdo */
+		char *(*rtrim)();  /* apara o lado direito */
+		char *(*trim)();   /* apara ambos os lados */
+		char *(*clear)();  /* remove os espaços extras */
+		char *(*lower)();  /* caixa baixa */
+		char *(*upper)();  /* caixa alta */
+		char *(*title)();  /* caixa alta apenas na letras iniciais */
 
-
-		int   (*len)();   /* devolve o tamanho da string */
-		void  (*free)();  /* libera memória */
-	} ctextObject;
+		long int (*len)(); /* devolve o tamanho da string */
+		int   (*match)();  /* compara strings e diz se são iguais */
+		void  (*free)();   /* libera memória */
+	} CTEXT_MAIN_TYPE;
 
 /*-----------------------------------------------------------------------------
-	__ctext_set__ ()
+	__NewTextObject_set ()
 		Define o valor da string
 		str: valor da string a ser definida
+		Retorna o valor da nova string
 -----------------------------------------------------------------------------*/
-	char * __ctext_set__ (ctextObject *self, char *str);
-
-	#define __CTEXT_SET__(SELF)               \
-		char * __ctext_set__##SELF (char *str) \
-		{                                      \
-			return __ctext_set__(&SELF, str);   \
-		}                                      \
-		SELF.set = __ctext_set__##SELF;        \
+	char * __NewTextObject_set (CTEXT_MAIN_TYPE *self, char *str);
 
 /*-----------------------------------------------------------------------------
-	__ctext_get__ ()
-		Retorna o valor da String do "objeto"
+	__NewTextObject_get ()
+		Retorna o valor da String
 -----------------------------------------------------------------------------*/
-	char *__ctext_get__ (ctextObject *self);
-
-	#define __CTEXT_GET__(SELF)        \
-		char *__ctext_get__##SELF ()    \
-		{                               \
-			return __ctext_get__(&SELF); \
-		}                               \
-		SELF.get = __ctext_get__##SELF; \
+	char *__NewTextObject_get (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_add__ ()
+	__NewTextObject_add ()
 		Acrescenta a String ao fim
 		str: string a ser adicionar ao final
+		Retorna o valor da nova string
 -----------------------------------------------------------------------------*/
-	char *__ctext_add__ (ctextObject *self, char *str);
-
-	#define __CTEXT_ADD__(SELF)              \
-		char *__ctext_add__##SELF (char *str) \
-		{                                     \
-			return __ctext_add__(&SELF, str);  \
-		}                                     \
-		SELF.add = __ctext_add__##SELF;       \
+	char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str);
 
 /*-----------------------------------------------------------------------------
-	__ctext_write__ ()
+	__NewTextObject_write ()
 		Imprime na tela a string
 		Retorna um número diferente de zero se ocorreu um erro
 -----------------------------------------------------------------------------*/
-	int __ctext_write__ (ctextObject *self);
-
-	#define __CTEXT_WRITE__(SELF)          \
-		int __ctext_write__##SELF ()       \
-		{                                   \
-			return __ctext_write__(&SELF);          \
-		}                                   \
-		SELF.write = __ctext_write__##SELF; \
+	int __NewTextObject_write (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_read__ ()
+	__NewTextObject_read ()
 		Define o valor da string a partir da entrada padrão
 		msg: Texto a ser exibido para obtenção dos dados
 		Retorna um número diferente de zero se um erro ocorreu
 -----------------------------------------------------------------------------*/
-	int __ctext_read__ (ctextObject *self, char *msg);
-
-	#define __CTEXT_READ__(SELF)              \
-		int __ctext_read__##SELF (char *msg) \
-		{                                     \
-			return __ctext_read__(&SELF, msg);  \
-		}                                     \
-		SELF.read = __ctext_read__##SELF;       \
+	int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg);
 
 /*-----------------------------------------------------------------------------
-	__ctext_fwrite__ ()
+	__NewTextObject_fwrite ()
 		Atribui o valor da string a um arquivo
 		file: Endereço do arquivo
 		Retorna um número diferente de zero se um erro ocorreu
 -----------------------------------------------------------------------------*/
-	int __ctext_fwrite__ (ctextObject *self, char *file);
-
-	#define __CTEXT_FWRITE__(SELF)              \
-		int __ctext_fwrite__##SELF (char *file) \
-		{                                     \
-			return __ctext_fwrite__(&SELF, file);  \
-		}                                     \
-		SELF.fwrite = __ctext_fwrite__##SELF;       \
+	int __NewTextObject_fwrite (CTEXT_MAIN_TYPE *self, char *file);
 
 /*-----------------------------------------------------------------------------
-	__ctext_fread__ ()
+	__NewTextObject_fread ()
 		Define o valor da string a partir do conteúdo do arquivo de texto
 		file: Endereço do arquivo
 		Retorna um número diferente de zero se um erro ocorreu
 -----------------------------------------------------------------------------*/
-	int __ctext_fread__ (ctextObject *self, char *file);
-
-	#define __CTEXT_FREAD__(SELF)              \
-		int __ctext_fread__##SELF (char *file) \
-		{                                     \
-			return __ctext_fread__(&SELF, file);  \
-		}                                     \
-		SELF.fread = __ctext_fread__##SELF;       \
+	int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file);
 
 /*-----------------------------------------------------------------------------
-	__ctext_ltrim__ ()
+	__NewTextObject_ltrim ()
 		Elimina os espaços à esquerda
 -----------------------------------------------------------------------------*/
-	char * __ctext_ltrim__ (ctextObject *self);
-
-	#define __CTEXT_LTRIM__(SELF)          \
-		char * __ctext_ltrim__##SELF ()     \
-		{                                   \
-			return __ctext_ltrim__(&SELF);   \
-		}                                   \
-		SELF.ltrim = __ctext_ltrim__##SELF; \
+	char * __NewTextObject_ltrim (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_rtrim__ ()
+	__NewTextObject_rtrim ()
 		Elimina os espaços à direita
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_rtrim__ (ctextObject *self);
-
-	#define __CTEXT_RTRIM__(SELF)          \
-		char *__ctext_rtrim__##SELF ()      \
-		{                                   \
-			return __ctext_rtrim__(&SELF);   \
-		}                                   \
-		SELF.rtrim = __ctext_rtrim__##SELF; \
+	char *__NewTextObject_rtrim (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_trim__ ()
+	__NewTextObject_trim ()
 		Elimina os espaços à esquerda e à direita
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_trim__ (ctextObject *self);
-
-	#define __CTEXT_TRIM__(SELF)         \
-		char *__ctext_trim__##SELF ()     \
-		{                                 \
-			return __ctext_trim__(&SELF);  \
-		}                                 \
-		SELF.trim = __ctext_trim__##SELF; \
+	char *__NewTextObject_trim (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_clear__ ()
+	__NewTextObject_clear ()
 		Elimina os espaços extras
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_clear__ (ctextObject *self);
-
-	#define __CTEXT_CLEAR__(SELF)          \
-		char *__ctext_clear__##SELF ()      \
-		{                                   \
-			return __ctext_clear__(&SELF);   \
-		}                                   \
-		SELF.clear = __ctext_clear__##SELF; \
+	char *__NewTextObject_clear (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_lower__ ()
+	__NewTextObject_lower ()
 		Caixa baixa
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_lower__ (ctextObject *self);
-
-	#define __CTEXT_LOWER__(SELF)          \
-		char *__ctext_lower__##SELF ()      \
-		{                                   \
-			return __ctext_lower__(&SELF);   \
-		}                                   \
-		SELF.lower = __ctext_lower__##SELF; \
+	char *__NewTextObject_lower (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_upper__ ()
+	__NewTextObject_upper ()
 		Caixa alta
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_upper__ (ctextObject *self);
-
-	#define __CTEXT_UPPER__(SELF)          \
-		char *__ctext_upper__##SELF ()      \
-		{                                   \
-			return __ctext_upper__(&SELF);   \
-		}                                   \
-		SELF.upper = __ctext_upper__##SELF; \
+	char *__NewTextObject_upper (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_title__ ()
+	__NewTextObject_title ()
 		Primeira maiúscula apenas
+		Retorna a string modificada
 -----------------------------------------------------------------------------*/
-	char *__ctext_title__ (ctextObject *self);
-
-	#define __CTEXT_TITLE__(SELF)          \
-		char *__ctext_title__##SELF ()      \
-		{                                   \
-			return __ctext_title__(&SELF);   \
-		}                                   \
-		SELF.title = __ctext_title__##SELF; \
+	char *__NewTextObject_title (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_len__ ()
-		Retorna o tamanho da String do "objeto"
+	__NewTextObject_len ()
+		Retorna o tamanho da String
 -----------------------------------------------------------------------------*/
-	int __ctext_len__ (ctextObject *self);
-
-	#define __CTEXT_LEN__(SELF)        \
-		int __ctext_len__##SELF ()      \
-		{                               \
-			return __ctext_len__(&SELF); \
-		}                               \
-		SELF.len = __ctext_len__##SELF; \
+	long int __NewTextObject_len (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
-	__ctext_free__ ()
+	__NewTextObject_match ()
+		Informa se a string do objeto é igual à sting informada
+		str: string a ser comparada
+		Retorna 0 para falso e 1 para verdadeiro
+-----------------------------------------------------------------------------*/
+	int __NewTextObject_match (CTEXT_MAIN_TYPE *self, char *str);
+
+/*-----------------------------------------------------------------------------
+	__NewTextObject_free ()
 		libera memória
 -----------------------------------------------------------------------------*/
-	void __ctext_free__ (ctextObject *self);
-
-	#define __CTEXT_FREE__(SELF)         \
-		void __ctext_free__##SELF ()      \
-		{                                 \
-			__ctext_free__(&SELF);         \
-		}                                 \
-		SELF.free = __ctext_free__##SELF; \
-
-/*-----------------------------------------------------------------------------
-	new_CSR () construtor da estrutura
------------------------------------------------------------------------------*/
-	#define new_STR(OBJECT, STRING)              \
-		ctextObject OBJECT;	                     \
-		OBJECT._string = NULL;                    \
-                                                \
-		__CTEXT_SET__(OBJECT);                    \
-		__CTEXT_GET__(OBJECT);                    \
-		__CTEXT_ADD__(OBJECT);                    \
-		__CTEXT_WRITE__(OBJECT);                  \
-		__CTEXT_READ__(OBJECT);                   \
-		__CTEXT_FWRITE__(OBJECT);                 \
-		__CTEXT_FREAD__(OBJECT);                  \
-		__CTEXT_LTRIM__(OBJECT);                  \
-		__CTEXT_RTRIM__(OBJECT);                  \
-		__CTEXT_TRIM__(OBJECT);                   \
-		__CTEXT_CLEAR__(OBJECT);                  \
-		__CTEXT_LOWER__(OBJECT);                  \
-		__CTEXT_UPPER__(OBJECT);                  \
-		__CTEXT_TITLE__(OBJECT);                  \
-		__CTEXT_LEN__(OBJECT);                    \
-		__CTEXT_FREE__(OBJECT);                   \
-                                                \
-		OBJECT.set(STRING == NULL ? "" : STRING); \
+	void __NewTextObject_free (CTEXT_MAIN_TYPE *self);
 
 #endif
