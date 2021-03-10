@@ -370,6 +370,63 @@ int __NewTextObject_match (CTEXT_MAIN_TYPE *self, char *str)
 
 /*----------------------------------------------------------------------------*/
 
+long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
+{
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return -1;}
+
+	/* variáveis locais */
+	char *point;
+	char *temp     = self->_string;
+	long int index = 0;
+	point = strstr(temp, str);
+
+	/* testes */
+	if (str == NULL || point == NULL) {return -1;}
+
+	while (strcmp(temp, point) != 0) {
+		temp++;
+		index++;
+	}
+	
+	return index;
+}
+
+/*----------------------------------------------------------------------------*/
+
+int __NewTextObject_replace (CTEXT_MAIN_TYPE *self, char *str1, char *str2)
+{
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return 1;}
+
+	/* variáveis locais */
+	char *temp1;
+	char *temp3;
+	long int index;
+	index = self->index(str1);
+
+	/* verificações */
+	if (index < 0 || str2 == NULL) {return 2;}
+	if (strcmp(str1, str2) == 0)   {return 3;}
+
+	/* fragmentações */
+	temp1 = self->_string;
+	temp1[index] = '\0';
+	temp3 = self->_string[index + strlen(str1)];
+
+	/* manipulações */
+	self->set(temp1);
+	self->add(str2);
+	self->add(temp3);
+
+	return 0;
+}
+
+
+
+
+/*----------------------------------------------------------------------------*/
+
 void __NewTextObject_free (CTEXT_MAIN_TYPE *self)
 {
 	if (self->_string != NULL) {
