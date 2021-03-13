@@ -77,6 +77,19 @@
 /*----------------------------------------------------------------------------*/
 int main(int argc, char *argv[]) {
 
+	new_String(bunda, "will");
+	bunda.replace("w", "WWWWWWWW");
+	bunda.write();
+	bunda.free();
+
+
+
+
+
+
+
+
+
 	/* variáveis locais */
 	int quit = 0;
 	new_String(data, ""); /* registra a entrada de dados do usuário */
@@ -214,13 +227,12 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-
-
 	/* sair */
 	data.free();
 	attr.free();
-	printf("\a%s\n\nPress enter to exit...", STYLE_DEFAULT);
+	printf("%s\n\nPress enter to exit...", STYLE_DEFAULT);
 	fgetc(stdin);
+	puts("\a");
 	puts(STYLE_RESET);
 	system("clear");
 	exit(0);

@@ -46,21 +46,21 @@ SOFTWARE.
 	/* -- Define os construtores dos métodos -- */
 
 	/*: Método com retorno e sem atributo */
-	#define CTEXT_NEW_TYPE_METHOD__(SELF, NAME, TYPE) \
+	#define CTEXT_NEW_TYPE_METHOD(SELF, NAME, TYPE) \
 		TYPE __NewTextObject_##NAME##_##SELF () { \
 			return __NewTextObject_##NAME(&SELF); \
 		} \
 		SELF.NAME = __NewTextObject_##NAME##_##SELF;
 
 	/*: Método com retorno e com um atributo */
-	#define CTEXT_NEW_TYPE_ATTR_METHOD__(SELF, NAME, TYPE, ATYPE, ATTR) \
+	#define CTEXT_NEW_TYPE_ATTR_METHOD(SELF, NAME, TYPE, ATYPE, ATTR) \
 		TYPE __NewTextObject_##NAME##_##SELF (ATYPE ATTR) { \
 			return __NewTextObject_##NAME(&SELF, ATTR); \
 		} \
 		SELF.NAME = __NewTextObject_##NAME##_##SELF;
 
 	/*: Método com retorno e com dois atributos */
-	#define CTEXT_NEW_TYPE_ATTRS_METHOD__(SELF, NAME, TYPE, ATYPE, ATTR, ATYPE2, ATTR2) \
+	#define CTEXT_NEW_TYPE_ATTRS_METHOD(SELF, NAME, TYPE, ATYPE, ATTR, ATYPE2, ATTR2) \
 		TYPE __NewTextObject_##NAME##_##SELF (ATYPE ATTR, ATYPE2 ATTR2) { \
 			return __NewTextObject_##NAME(&SELF, ATTR, ATTR2); \
 		} \
@@ -69,7 +69,7 @@ SOFTWARE.
 
 
 	/*: Método sem e sem atributo */
-	#define CTEXT_NEW_VOID_METHOD__(SELF, NAME) \
+	#define CTEXT_NEW_VOID_METHOD(SELF, NAME) \
 		void __NewTextObject_##NAME##_##SELF () { \
 			__NewTextObject_##NAME(&SELF); \
 		} \
@@ -79,24 +79,25 @@ SOFTWARE.
 	#define new_String(OBJECT, INITIAL) \
 		CTEXT_MAIN_TYPE OBJECT;	\
 \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, set, char *, char *, str); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, get, char *); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, add, char *, char *, str); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, write, int); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, read, int, char *, msg); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, fwrite, int, char *, file); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, fread, int, char *, file); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, ltrim, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, rtrim, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, trim, char *);  \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, clear, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, lower, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, upper, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, title, char *); \
-		CTEXT_NEW_TYPE_METHOD__(OBJECT, len, long int); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, match, int, char *, str); \
-		CTEXT_NEW_TYPE_ATTR_METHOD__(OBJECT, index, long int, char *, str); \
-		CTEXT_NEW_VOID_METHOD__(OBJECT, free); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, set, char *, char *, str); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, get, char *); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, add, char *, char *, str); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, write, int); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, read, int, char *, msg); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, fwrite, int, char *, file); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, fread, int, char *, file); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, ltrim, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, rtrim, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, trim, char *);  \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, clear, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, lower, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, upper, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, title, char *); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, len, long int); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, match, int, char *, str); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, index, long int, char *, str); \
+		CTEXT_NEW_TYPE_ATTRS_METHOD(OBJECT, replace, int, char *, str1, char *, str2); \
+		CTEXT_NEW_VOID_METHOD(OBJECT, free); \
 \
 		OBJECT._string = NULL; \
 		OBJECT.set(INITIAL == NULL ? "" : INITIAL); \

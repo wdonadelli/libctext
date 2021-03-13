@@ -400,19 +400,19 @@ int __NewTextObject_replace (CTEXT_MAIN_TYPE *self, char *str1, char *str2)
 	if (self->_string == NULL) {return 1;}
 
 	/* variáveis locais */
-	char *temp1;
-	char *temp3;
-	long int index;
-	index = self->index(str1);
+	long int lenght = strlen(self->_string);
+	long int index  = self->index(str1);
+	char temp1[lenght];
+	char temp3[lenght];
 
 	/* verificações */
 	if (index < 0 || str2 == NULL) {return 2;}
-	if (strcmp(str1, str2) == 0)   {return 3;}
+	if (strcmp(str1, str2) == 0)   {return 0;}
 
 	/* fragmentações */
-	temp1 = self->_string;
+	strcpy(temp1, self->_string);
+	strcpy(temp3, &self->_string[index + strlen(str1)]);
 	temp1[index] = '\0';
-	temp3 = self->_string[index + strlen(str1)];
 
 	/* manipulações */
 	self->set(temp1);
