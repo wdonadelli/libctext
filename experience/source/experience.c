@@ -16,6 +16,8 @@
 #define INPUT_FILE    STYLE_PROMPT "File path: " STYLE_VALUE
 #define INPUT_INPUT   STYLE_PROMPT "Message: " STYLE_VALUE
 #define INPUT_CHECK   STYLE_PROMPT "Text to check: " STYLE_VALUE
+#define INPUT_OLD     STYLE_PROMPT "Text to replace: " STYLE_VALUE
+#define INPUT_NEW     STYLE_PROMPT "Replacement text: " STYLE_VALUE
 
 /*-- Complementos --*/
 #define MAIN "myString"
@@ -23,10 +25,11 @@
 #define VALUE(RETURN, TYPE) \
 	printf( \
 		( \
+			TYPE == 'c' ? "%s\'%c\'" : ( \
 			TYPE == 's' ? "%s\"%s\"" : ( \
 			TYPE == 'd' ? "%s%d" : ( \
 			TYPE == 'l' ? "\n%s%ld" : \
-			"%s%s" )) \
+			"%s%s" ))) \
 		), \
 		STYLE_VALUE, RETURN \
 	)
@@ -44,10 +47,11 @@
 #define METHOD0(NAME, RETURN, TYPE) \
 	printf( \
 		( \
+			TYPE == 'c' ? "%s%s.%s();\n%s\'%c\'%s" : ( \
 			TYPE == 's' ? "%s%s.%s();\n%s\"%s\"%s" : ( \
 			TYPE == 'd' ? "%s%s.%s();\n%s%d%s" : ( \
 			TYPE == 'l' ? "%s%s.%s();\n%s%ld%s" : \
-			              "%s%s.%s();\n%s%s%s" )) \
+			              "%s%s.%s();\n%s%s%s" ))) \
 		), \
 		STYLE_METHOD, MAIN, NAME, STYLE_VALUE, RETURN, STYLE_DEFAULT\
 	)
@@ -77,19 +81,6 @@
 /*----------------------------------------------------------------------------*/
 int main(int argc, char *argv[]) {
 
-	new_String(bunda, "will");
-	bunda.replace("w", "WWWWWWWW");
-	bunda.write();
-	bunda.free();
-
-
-
-
-
-
-
-
-
 	/* variáveis locais */
 	int quit = 0;
 	new_String(data, ""); /* registra a entrada de dados do usuário */
@@ -97,7 +88,7 @@ int main(int argc, char *argv[]) {
 
 	/* iniciar */
 	puts(STYLE_DEFAULT);
-	//system("clear"); /* limpar tela */
+	system("clear"); /* limpar tela */
 	printf("%s%48s%32s%s\n\n", STYLE_TITLE, "LIBCTEXT EXAMPLE", " ", STYLE_DEFAULT);
 
 	/* valor inicial */	
@@ -167,8 +158,8 @@ int main(int argc, char *argv[]) {
 			data.read(INPUT_CHECK);
 			METHOD1("index", data.get(), myString.index(data.get()), 'l');
 		} else if (data.match("replace")) {
-			data.read(INPUT_CHECK);
-			attr.read(INPUT_CHECK);
+			data.read(INPUT_OLD);
+			attr.read(INPUT_NEW);
 			printf("%smyString.replace(%s\"%s\"%s, %s\"%s\"%s);\n%s%d",
 				STYLE_METHOD, 
 				STYLE_VALUE,
@@ -180,6 +171,9 @@ int main(int argc, char *argv[]) {
 				STYLE_VALUE,
 				myString.replace(data.get(), attr.get())
 			);
+		} else if (data.match("cget")) {
+			printf(STYLE_DEFAULT);
+			METHOD0("cget", myString.cget(data.get()), 'c');
 		} else {
 			int j = 0;
 			char *methods[] = {
@@ -206,6 +200,9 @@ int main(int argc, char *argv[]) {
 				"index",
 				"replace",
 				"free",
+
+				"cget",
+
 				NULL
 			};
 			printf(STYLE_VALUE);

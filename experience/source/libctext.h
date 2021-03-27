@@ -97,9 +97,11 @@ SOFTWARE.
 		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, match, int, char *, str); \
 		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, index, long int, char *, str); \
 		CTEXT_NEW_TYPE_ATTRS_METHOD(OBJECT, replace, int, char *, str1, char *, str2); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, cget, char); \
 		CTEXT_NEW_VOID_METHOD(OBJECT, free); \
 \
 		OBJECT._string = NULL; \
+		OBJECT.cget = __NewTextObject_cget; \
 		OBJECT.set(INITIAL == NULL ? "" : INITIAL); \
 
 /*-----------------------------------------------------------------------------
@@ -142,6 +144,7 @@ SOFTWARE.
 		int   (*match)();    /* compara strings e diz se são iguais */
 		long int (*index)(); /* informa a posição da substring */
 		int (*replace)();    /* informa a posição da substring */
+		char (*cget)();      /* lê apenas um caracter e o retorna */
 		void  (*free)();     /* libera memória */
 	} CTEXT_MAIN_TYPE;
 
@@ -282,5 +285,12 @@ SOFTWARE.
 		libera memória
 -----------------------------------------------------------------------------*/
 	void __NewTextObject_free (CTEXT_MAIN_TYPE *self);
+
+/*-----------------------------------------------------------------------------
+	__NewTextObject_cget ()
+		Lê um caractere imprimível e o retorna sem modificar a String
+		Retorna nulo ('\0') em caso de insucesso
+-----------------------------------------------------------------------------*/
+	char __NewTextObject_cget ();
 
 #endif
