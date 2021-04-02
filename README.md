@@ -1,39 +1,12 @@
-# SQLite Request Library - CSR
+# Text manipulation library - cText
 
-SCR is a library written in C language designed to simplify requests with an [SQLite](https://www.sqlite.org/) database.
+**cText** is a library written in C language with a focus on text manipulation (strings) using methods whose use is similar to object-oriented programming using structures.
 
-The interaction with the database occurs through a structure (type) that points to attributes and methods responsible for the requests.
+The present tool was built from the existing libraries in the C language: `stdio`, `stdlib`, `string` and `ctype`. Therefore, its limitations can affect the functioning of the library.
 
-## Handbook
+### Links
 
-[https://wdonadelli.github.io/libcsrequest/](https://wdonadelli.github.io/libcsrequest/)
+- [GitHub](https://github.com/wdonadelli/libctext)
+- [libctext.h](https://wdonadelli.github.io/libctext/libctext.h)
+- [libctext.c](https://wdonadelli.github.io/libctext/libctext.c)
 
-## Source Code
-
-- [libcsrequest.h](https://wdonadelli.github.io/libcsrequest/libcsrequest.h)
-- [libcsrequest.c](https://wdonadelli.github.io/libcsrequest/libcsrequest.c)
-
-## Package
-
-- *libsqlite3-dev* package or equivalent.
-
-## Compilation (GCC) 
-
-To compile the source code it is necessary to use the `-l sqlite3` flag.
-
-```sh
-gcc -c libcsrequest.c -l sqlite3
-```
-
-## Version
-
-#### v1.2.0 (2020-05-21)
-
-- added "free" method
-- improvement of the allocated memory release system
-- changed the return of the "info" method (from "" to NULL)
-- fixed sql display error in terminal
-
-## Authors
-
-- Willian Donadelli (<wdonadelli@gmail.com>)

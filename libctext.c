@@ -340,7 +340,7 @@ char *__NewTextObject_title (CTEXT_MAIN_TYPE *self)
 
 /*----------------------------------------------------------------------------*/
 
-long int __NewTextObject_len (CTEXT_MAIN_TYPE *self)
+unsigned long int __NewTextObject_len (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return 0;}
@@ -370,7 +370,7 @@ int __NewTextObject_match (CTEXT_MAIN_TYPE *self, char *str)
 
 /*----------------------------------------------------------------------------*/
 
-long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
+unsigned long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
 {
 	/* verificando memória alocada */
 	if (self->_string == NULL) {return -1;}
