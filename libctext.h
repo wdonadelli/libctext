@@ -47,6 +47,7 @@ SOFTWARE.
 
 	/*: Método com retorno e sem atributo */
 	#define CTEXT_NEW_TYPE_METHOD(SELF, NAME, TYPE) \
+		SELF.NAME = NULL; \
 		TYPE __NewTextObject_##NAME##_##SELF () { \
 			return __NewTextObject_##NAME(&SELF); \
 		} \
@@ -54,6 +55,7 @@ SOFTWARE.
 
 	/*: Método com retorno e com um atributo */
 	#define CTEXT_NEW_TYPE_ATTR_METHOD(SELF, NAME, TYPE, ATYPE, ATTR) \
+		SELF.NAME = NULL; \
 		TYPE __NewTextObject_##NAME##_##SELF (ATYPE ATTR) { \
 			return __NewTextObject_##NAME(&SELF, ATTR); \
 		} \
@@ -61,6 +63,7 @@ SOFTWARE.
 
 	/*: Método com retorno e com dois atributos */
 	#define CTEXT_NEW_TYPE_ATTRS_METHOD(SELF, NAME, TYPE, ATYPE, ATTR, ATYPE2, ATTR2) \
+		SELF.NAME = NULL; \
 		TYPE __NewTextObject_##NAME##_##SELF (ATYPE ATTR, ATYPE2 ATTR2) { \
 			return __NewTextObject_##NAME(&SELF, ATTR, ATTR2); \
 		} \
@@ -68,6 +71,7 @@ SOFTWARE.
 
 	/*: Método sem e sem atributo */
 	#define CTEXT_NEW_VOID_METHOD(SELF, NAME) \
+		SELF.NAME = NULL; \
 		void __NewTextObject_##NAME##_##SELF () { \
 			__NewTextObject_##NAME(&SELF); \
 		} \
@@ -76,6 +80,7 @@ SOFTWARE.
 	/* -- Define o construtor da estrutura/objeto */
 	#define new_String(OBJECT, INITIAL) \
 		CTEXT_MAIN_TYPE OBJECT;	\
+		OBJECT._string = NULL; \
 \
 		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, set, char *, char *, str); \
 		CTEXT_NEW_TYPE_METHOD(OBJECT, get, char *); \
@@ -97,7 +102,7 @@ SOFTWARE.
 		CTEXT_NEW_TYPE_ATTRS_METHOD(OBJECT, replace, int, char *, str1, char *, str2); \
 		CTEXT_NEW_VOID_METHOD(OBJECT, free); \
 \
-		OBJECT._string = (char *) malloc(sizeof(char)); \
+		OBJECT._string = (char *) malloc(2 * sizeof(char)); \
 		if (OBJECT._string == NULL) { \
 			puts("Memory allocation error!"); \
 			exit(1); \
@@ -142,8 +147,8 @@ SOFTWARE.
 		char *(*title)(); /* caixa alta apenas na letras iniciais */
 
 		unsigned long int (*len)();   /* devolve o tamanho da string */
-		int   (*match)();             /* compara strings e diz se são iguais */
 		unsigned long int (*index)(); /* informa a posição da substring */
+		int   (*match)();             /* compara strings e diz se são iguais */
 		int (*replace)();             /* informa a posição da substring */
 		void  (*free)();              /* libera memória */
 	} CTEXT_MAIN_TYPE;

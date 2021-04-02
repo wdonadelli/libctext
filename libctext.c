@@ -11,6 +11,8 @@
 	VAR = (char *) realloc(VAR, (LEN + 1) * sizeof(char)); \
 	CHECK_MEMORY(VAR)
 
+
+
 static char _ctext_case(char value, int type)
 /* Devolve a caixa solicitada do caractere, type: 0 lowercase, 1 uppercase */
 {
@@ -46,6 +48,9 @@ static char _ctext_case(char value, int type)
 char *__NewTextObject_set (CTEXT_MAIN_TYPE *self, char *str)
 {
 
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
 	/* definir apenas se o valor de str for diferente de NULL */
 	if (str != NULL) {
 
@@ -70,14 +75,19 @@ char *__NewTextObject_get (CTEXT_MAIN_TYPE *self)
 
 char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str)
 {
+
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
 	/* definindo variáveis locais*/
-	char *temp = self->_string;
+	char temp[strlen(self->_string) + 1];
+	strcpy(temp, self->_string);
 
 	/* definir apenas se o valor de str for diferente de NULL */
 	if (str != NULL) {
 
 		/* alocando memória */
-		STR_SET_MEMORY(self->_string, strlen(str) + strlen(temp));
+		STR_SET_MEMORY(self->_string, (strlen(str) + strlen(temp)));
 
 		/* definindo valor de _string */
 		strcpy(self->_string, temp);
@@ -91,12 +101,16 @@ char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str)
 
 int __NewTextObject_write (CTEXT_MAIN_TYPE *self)
 {
+
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return 1;}
+
 	/* definindo variáveis locais e valores iniciais */
 	int check;
 
 	/* imprimindo */
 	check = puts(self->_string == NULL ? "" : self->_string);
-	if (check < 0 || check == EOF) {return 1;}
+	if (check < 0 || check == EOF) {return 2;}
 
 	return 0;
 }
@@ -223,6 +237,11 @@ char *__NewTextObject_rtrim (CTEXT_MAIN_TYPE *self)
 
 char *__NewTextObject_trim (CTEXT_MAIN_TYPE *self)
 {
+
+	/* verificando memória alocada */
+	if (self->_string == NULL) {return self->get();}
+
+	/* aparando */
 	self->ltrim();
 	self->rtrim();
 	return self->get();
@@ -400,8 +419,8 @@ int __NewTextObject_replace (CTEXT_MAIN_TYPE *self, char *str1, char *str2)
 	if (self->_string == NULL) {return 1;}
 
 	/* variáveis locais */
-	long int lenght = strlen(self->_string);
-	long int index  = self->index(str1);
+	unsigned long int lenght = strlen(self->_string);
+	unsigned long int index  = self->index(str1);
 	char temp1[lenght];
 	char temp3[lenght];
 

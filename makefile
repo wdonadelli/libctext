@@ -12,7 +12,7 @@ cText.o:
 	@ echo "cText.o file created."
 
 clean:
-	@ rm cText.o libctext.o cText
+	@ rm -f cText.o libctext.o cText
 	@ echo "Done!"
 
 run: all
