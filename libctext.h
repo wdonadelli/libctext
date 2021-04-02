@@ -66,8 +66,6 @@ SOFTWARE.
 		} \
 		SELF.NAME = __NewTextObject_##NAME##_##SELF;
 
-
-
 	/*: Método sem e sem atributo */
 	#define CTEXT_NEW_VOID_METHOD(SELF, NAME) \
 		void __NewTextObject_##NAME##_##SELF () { \
@@ -99,8 +97,13 @@ SOFTWARE.
 		CTEXT_NEW_TYPE_ATTRS_METHOD(OBJECT, replace, int, char *, str1, char *, str2); \
 		CTEXT_NEW_VOID_METHOD(OBJECT, free); \
 \
-		OBJECT._string = NULL; \
-		OBJECT.set(INITIAL == NULL ? "" : INITIAL); \
+		OBJECT._string = (char *) malloc(sizeof(char)); \
+		if (OBJECT._string == NULL) { \
+			puts("Memory allocation error!"); \
+			exit(1); \
+		} \
+		strcpy(OBJECT._string, ""); \
+		if (INITIAL != NULL) {OBJECT.set(INITIAL);} \
 
 /*-----------------------------------------------------------------------------
 	Bibliotecas necessárias: FIXME precisa de tudo isso mesmo?

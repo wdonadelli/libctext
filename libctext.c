@@ -7,8 +7,8 @@
 #define CHECK_MEMORY(VAR) if (VAR == NULL) {puts(MEMORY_ERROR); exit(1);}
 
 /* Aloca memória de caracteres e checa o resultado */
-#define STR_SET_MEMORY(VAR,LEN) \
-	VAR = malloc((LEN + 1) * sizeof(char)); \
+#define STR_SET_MEMORY(VAR, LEN) \
+	VAR = (char *) realloc(VAR, (LEN + 1) * sizeof(char)); \
 	CHECK_MEMORY(VAR)
 
 static char _ctext_case(char value, int type)

@@ -1,5 +1,9 @@
 #include "libctext.h"
 
+/*-- Limpar tela --*/
+#define CLEAR 0
+#define CLEAR_SCREEN if (CLEAR) system("clear")
+
 /*-- Cores --*/
 #define STYLE_RESET   "\e[0m"         /* limpa a formatação */
 #define STYLE_DEFAULT "\e[0;0;37;44m" /* estilo principal */
@@ -88,7 +92,7 @@ int main(int argc, char *argv[]) {
 
 	/* iniciar */
 	puts(STYLE_DEFAULT);
-	system("clear"); /* limpar tela */
+	CLEAR_SCREEN;
 	printf("%s%48s%32s%s\n\n", STYLE_TITLE, "LIBCTEXT EXAMPLE", " ", STYLE_DEFAULT);
 
 	/* valor inicial */	
@@ -226,6 +230,6 @@ int main(int argc, char *argv[]) {
 	fgetc(stdin);
 	puts("\a");
 	puts(STYLE_RESET);
-	system("clear");
+	CLEAR_SCREEN;
 	exit(0);
 }

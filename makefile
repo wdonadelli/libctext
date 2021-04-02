@@ -18,5 +18,5 @@ clean:
 run: all
 	./cText
 
-check: all
-	@ valgrind --tool=memcheck --leak-check=yes --track-origins=yes ./cText
+check: clean all
+	@ valgrind --tool=memcheck --leak-check=yes --track-origins=yes -s ./cText
