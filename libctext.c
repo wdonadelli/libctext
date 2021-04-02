@@ -432,17 +432,3 @@ void __NewTextObject_free (CTEXT_MAIN_TYPE *self)
 }
 
 /*----------------------------------------------------------------------------*/
-
-char __NewTextObject_cget ()
-{
-	//char c = fgetc(stdin);
-	//return (c > 0 && c <= 255) ? c : '\0';
-	char c[2];
-	scanf("%c", &c);
-	return (c > 0 && c <= 255) ? c : '\0';
-	
-	
-	
-
-}
-
