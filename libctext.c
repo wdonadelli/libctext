@@ -42,24 +42,38 @@ static char _ctext_case(char value, int type)
 	return value;
 }
 /*----------------------------------------------------------------------------*/
+/*
+static int _ctext_get (CTEXT_MAIN_TYPE *self, char *str)
+{
+	if (str == NULL) return 1;
+	self->set(str);
+	return 0;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
 
 /*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
 char *__NewTextObject_set (CTEXT_MAIN_TYPE *self, char *str)
 {
+	/* verificando memória alocada e atributo */
+	if (self->_string == NULL || str == NULL) return self->get();
 
-	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	/* alocando memória */
+	STR_SET_MEMORY(self->_string, strlen(str));
 
-	/* definir apenas se o valor de str for diferente de NULL */
-	if (str != NULL) {
-
-		/* alocando memória */
-		STR_SET_MEMORY(self->_string, strlen(str));
-
-		/* definindo valor de _string */
-		strcpy(self->_string, str);
-	}
+	/* definindo valor de _string */
+	strcpy(self->_string, str);
 
 	return self->get();
 }
@@ -75,24 +89,14 @@ char *__NewTextObject_get (CTEXT_MAIN_TYPE *self)
 
 char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str)
 {
+	/* verificando memória alocada e atributo */
+	if (self->_string == NULL || str == NULL) return self->get();
 
-	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	/* alocando memória */
+	STR_SET_MEMORY(self->_string, (strlen(self->_string) + strlen(str)));
 
-	/* definindo variáveis locais*/
-	char temp[strlen(self->_string) + 1];
-	strcpy(temp, self->_string);
-
-	/* definir apenas se o valor de str for diferente de NULL */
-	if (str != NULL) {
-
-		/* alocando memória */
-		STR_SET_MEMORY(self->_string, (strlen(str) + strlen(temp)));
-
-		/* definindo valor de _string */
-		strcpy(self->_string, temp);
-		strcat(self->_string, str);
-	}
+	/* definindo valor de _string */
+	strcat(self->_string, str);
 
 	return self->get();
 }
@@ -101,9 +105,8 @@ char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str)
 
 int __NewTextObject_write (CTEXT_MAIN_TYPE *self)
 {
-
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return 1;}
+	if (self->_string == NULL) return 1;
 
 	/* definindo variáveis locais e valores iniciais */
 	int check;
@@ -120,18 +123,17 @@ int __NewTextObject_write (CTEXT_MAIN_TYPE *self)
 int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return 1;}
+	if (self->_string == NULL) return 1;
 
 	/* definindo variáveis locais e valores iniciais */
-	char temp[2];
+	char temp[2] = {'\0', '\0'};
 	char c;
-	strcpy(temp, "");
 
-	/* exibindo a mensagem */
+	/* exibindo a mensagem e zerando string*/
 	printf("%s", msg);
+	self->set("");
 
 	/* obtendo caracteres */
-	self->set("");
 	while((c = fgetc(stdin)) != '\n') {
 		if (ferror(stdin)) {return 2;}
 		temp[0] = c;
@@ -146,7 +148,7 @@ int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg)
 int __NewTextObject_fwrite (CTEXT_MAIN_TYPE *self, char *file)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL || file == NULL) {return 1;}
+	if (self->_string == NULL || file == NULL) return 1;
 
 	/* definindo variáveis locais e valores iniciais */
 	FILE *path;
@@ -170,19 +172,18 @@ int __NewTextObject_fwrite (CTEXT_MAIN_TYPE *self, char *file)
 int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL || file == NULL) {return 1;}
+	if (self->_string == NULL || file == NULL) return 1;
 
 	/* definindo variáveis locais e valores iniciais */
 	FILE *path;
-	char temp[2];
+	char temp[2] = {'\0', '\0'};
 	char c;
-	strcpy(temp, "");
 
-	/* Tentando abri o arquivo para leitura */
+	/* Tentando abri o arquivo para leitura e zerando string */
 	if ((path = fopen(file, "r")) == NULL) {return 2;}
+	self->set("");
 
 	/* obtendo caracteres */
-	self->set("");
 	while((c = fgetc(path)) != EOF) {
 		if (ferror(path)) {return 3;}
 		temp[0] = c;
@@ -200,10 +201,12 @@ int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 char *__NewTextObject_ltrim (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* definindo variáveis locais*/
-	char *temp = self->_string;
+	char value[strlen(self->_string)+1], *temp;
+	strcpy(value, self->_string);
+	temp = value;
 
 	/* buscando valores imprimíveis a partir do início */
 	while (*temp) {
@@ -218,11 +221,14 @@ char *__NewTextObject_ltrim (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_rtrim (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* definindo variáveis locais*/
-	char *temp = self->_string;
-	int  count = strlen(temp);
+	char value[strlen(self->_string)+1], *temp;
+	int  count;
+	strcpy(value, self->_string);
+	temp = value;
+	count = strlen(self->_string);
 
 	/* acrescentando nulos ao final se valor não imprimível */
 	while (count > 0 && temp[count-1] >= 0 && temp[count-1] <= 32) {
@@ -237,9 +243,8 @@ char *__NewTextObject_rtrim (CTEXT_MAIN_TYPE *self)
 
 char *__NewTextObject_trim (CTEXT_MAIN_TYPE *self)
 {
-
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* aparando */
 	self->ltrim();
@@ -252,16 +257,18 @@ char *__NewTextObject_trim (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_clear (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* pré-requisito */
 	self->trim();
 
 	/* definindo variáveis locais*/
-	char *temp = self->_string;
+	char value[strlen(self->_string)+1], *temp;
 	int  space = 0;
 	char str[(strlen(self->_string)+1)];
+	strcpy(value, self->_string);
 	strcpy(str, "");
+	temp = value;
 
 	while (*temp) {
 		if (*temp > 32 || *temp < 0) {
@@ -286,7 +293,7 @@ char *__NewTextObject_clear (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_lower (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* definindo variáveis locais*/
 	char *temp = self->_string;
@@ -304,7 +311,7 @@ char *__NewTextObject_lower (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_upper (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* definindo variáveis locais*/
 	char *temp = self->_string;
@@ -322,7 +329,7 @@ char *__NewTextObject_upper (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_title (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return self->get();}
+	if (self->_string == NULL) return self->get();
 
 	/* pré-requisito */
 	self->lower();
@@ -359,10 +366,10 @@ char *__NewTextObject_title (CTEXT_MAIN_TYPE *self)
 
 /*----------------------------------------------------------------------------*/
 
-unsigned long int __NewTextObject_len (CTEXT_MAIN_TYPE *self)
+long int __NewTextObject_len (CTEXT_MAIN_TYPE *self)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return 0;}
+	if (self->_string == NULL) return 0;
 
 	/* definindo variáveis locais*/
 	float len  = 0;
@@ -381,7 +388,7 @@ unsigned long int __NewTextObject_len (CTEXT_MAIN_TYPE *self)
 int __NewTextObject_match (CTEXT_MAIN_TYPE *self, char *str)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return 0;}
+	if (self->_string == NULL) return 0;
 
 	/* comparando */
 	return (strcmp(self->_string, str) == 0) ? 1 : 0;
@@ -389,14 +396,14 @@ int __NewTextObject_match (CTEXT_MAIN_TYPE *self, char *str)
 
 /*----------------------------------------------------------------------------*/
 
-unsigned long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
+long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return -1;}
+	if (self->_string == NULL) return -1;
 
 	/* variáveis locais */
 	char *point;
-	char *temp     = self->_string;
+	char *temp = self->_string;
 	long int index = 0;
 	point = strstr(temp, str);
 
@@ -416,11 +423,11 @@ unsigned long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str)
 int __NewTextObject_replace (CTEXT_MAIN_TYPE *self, char *str1, char *str2)
 {
 	/* verificando memória alocada */
-	if (self->_string == NULL) {return 1;}
+	if (self->_string == NULL) return 1;
 
 	/* variáveis locais */
-	unsigned long int lenght = strlen(self->_string);
-	unsigned long int index  = self->index(str1);
+	long int lenght = strlen(self->_string);
+	long int index  = self->index(str1);
 	char temp1[lenght];
 	char temp3[lenght];
 
@@ -445,9 +452,7 @@ int __NewTextObject_replace (CTEXT_MAIN_TYPE *self, char *str1, char *str2)
 
 void __NewTextObject_free (CTEXT_MAIN_TYPE *self)
 {
-	if (self->_string != NULL) {
-		free(self->_string);
-	}
+	if (self->_string != NULL) free(self->_string);
 }
 
 /*----------------------------------------------------------------------------*/

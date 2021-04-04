@@ -96,9 +96,9 @@ SOFTWARE.
 		CTEXT_NEW_TYPE_METHOD(OBJECT, lower, char *); \
 		CTEXT_NEW_TYPE_METHOD(OBJECT, upper, char *); \
 		CTEXT_NEW_TYPE_METHOD(OBJECT, title, char *); \
-		CTEXT_NEW_TYPE_METHOD(OBJECT, len, unsigned long int); \
+		CTEXT_NEW_TYPE_METHOD(OBJECT, len, long int); \
 		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, match, int, char *, str); \
-		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, index, unsigned long int, char *, str); \
+		CTEXT_NEW_TYPE_ATTR_METHOD(OBJECT, index, long int, char *, str); \
 		CTEXT_NEW_TYPE_ATTRS_METHOD(OBJECT, replace, int, char *, str1, char *, str2); \
 		CTEXT_NEW_VOID_METHOD(OBJECT, free); \
 \
@@ -146,8 +146,8 @@ SOFTWARE.
 		char *(*upper)(); /* caixa alta */
 		char *(*title)(); /* caixa alta apenas na letras iniciais */
 
-		unsigned long int (*len)();   /* devolve o tamanho da string */
-		unsigned long int (*index)(); /* informa a posição da substring */
+		long int (*len)();   /* devolve o tamanho da string */
+		long int (*index)(); /* informa a posição da substring */
 		int   (*match)();             /* compara strings e diz se são iguais */
 		int (*replace)();             /* informa a posição da substring */
 		void  (*free)();              /* libera memória */
@@ -258,7 +258,7 @@ SOFTWARE.
 	__NewTextObject_len ()
 		Retorna o tamanho da String
 -----------------------------------------------------------------------------*/
-	unsigned long int __NewTextObject_len (CTEXT_MAIN_TYPE *self);
+	long int __NewTextObject_len (CTEXT_MAIN_TYPE *self);
 
 /*-----------------------------------------------------------------------------
 	__NewTextObject_match ()
@@ -274,7 +274,7 @@ SOFTWARE.
 		str: substring a ser localizada
 		Retorna -1 quando não encontrada ou a posição da substring
 -----------------------------------------------------------------------------*/
-	unsigned long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str);
+	long int __NewTextObject_index (CTEXT_MAIN_TYPE *self, char *str);
 
 /*-----------------------------------------------------------------------------
 	__NewTextObject_replace ()

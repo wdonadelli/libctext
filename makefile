@@ -16,7 +16,8 @@ clean:
 	@ echo "Done!"
 
 run: all
-	./cText
+	@ ./cText
 
 check: clean all
-	@ valgrind --tool=memcheck --leak-check=yes --track-origins=yes -s ./cText
+	@ echo "valgrind package is required."
+	@ valgrind --tool=memcheck --leak-check=yes --track-origins=yes -s ./cText show

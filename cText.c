@@ -1,8 +1,8 @@
 #include "libctext.h"
 
 /*-- Limpar tela --*/
-#define CLEAR 0
-#define CLEAR_SCREEN if (CLEAR) system("clear")
+#define CLEAR ((argc > 1 && strcmp(argv[1], "show") == 0) ? 0 : 1)
+#define CLEAR_SCREEN if (CLEAR) system("clear");
 
 /*-- Cores --*/
 #define STYLE_RESET   "\e[0m"         /* limpa a formatação */
