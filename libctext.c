@@ -143,14 +143,14 @@ int __NewTextObject_fwrite (CTEXT_MAIN_TYPE *self, char *file)
 	int check;
 
 	/* Tentando abri o arquivo para leitura */
-	if ((path = fopen(file, "w")) == NULL) {return 2;}
+	if ((path = fopen(file, "w")) == NULL) return 2;
 
 	/* escrevendo caracteres */
 	check = fputs(self->_string, path);
-	if (check < 0 || check == EOF) {return 3;}
+	if (check < 0 || check == EOF) return 3;
 
 	/* fechando arquivo */
-	if (fclose(path) != 0) {return 4;};
+	if (fclose(path) != 0) return 4;
 
 	return 0;
 }
@@ -167,7 +167,7 @@ int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 	char temp[256+2];
 
 	/* Tentando abri o arquivo para leitura e zerando string */
-	if ((path = fopen(file, "r")) == NULL) {return 2;}
+	if ((path = fopen(file, "r")) == NULL) return 2;
 	self->set("");
 
 	while (!feof(path)) {
@@ -176,7 +176,7 @@ int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 	}
 
 	/* fechando arquivo */
-	if (fclose(path) != 0) {return 4;};
+	if (fclose(path) != 0) return 4;
 	
 	return 0;
 }
