@@ -123,7 +123,7 @@ int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg)
 
 	/* obtendo caracteres */
 	while((c = fgetc(stdin)) != '\n') {
-		if (ferror(stdin)) {return 2;}
+		if (ferror(stdin)) return 2;
 		temp[0] = c;
 		self->add(temp);
 	}
