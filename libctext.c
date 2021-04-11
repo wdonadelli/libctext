@@ -8,8 +8,11 @@
 
 /* Aloca memória de caracteres e checa o resultado */
 #define STR_SET_MEMORY(VAR, LEN) \
-	VAR = (char *) realloc(VAR, (LEN + 1) * sizeof(char)); \
-	CHECK_MEMORY(VAR)
+	if (strlen(VAR) != LEN) { \
+		VAR = (char *) realloc(VAR, (LEN + 1) * sizeof(char)); \
+		CHECK_MEMORY(VAR) \
+	}
+
 
 
 
@@ -42,25 +45,6 @@ static char _ctext_case(char value, int type)
 	return value;
 }
 /*----------------------------------------------------------------------------*/
-/*
-static int _ctext_get (CTEXT_MAIN_TYPE *self, char *str)
-{
-	if (str == NULL) return 1;
-	self->set(str);
-	return 0;
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
 
 /*= = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = */
 
@@ -73,7 +57,7 @@ char *__NewTextObject_set (CTEXT_MAIN_TYPE *self, char *str)
 	STR_SET_MEMORY(self->_string, strlen(str));
 
 	/* definindo valor de _string */
-	strcpy(self->_string, str);
+	if (!self->match(str)) {strcpy(self->_string, str);}
 
 	return self->get();
 }
@@ -90,7 +74,11 @@ char *__NewTextObject_get (CTEXT_MAIN_TYPE *self)
 char *__NewTextObject_add (CTEXT_MAIN_TYPE *self, char *str)
 {
 	/* verificando memória alocada e atributo */
-	if (self->_string == NULL || str == NULL) return self->get();
+	if (
+		self->_string == NULL ||
+		str == NULL ||
+		strlen(str) == 0
+	) return self->get();
 
 	/* alocando memória */
 	STR_SET_MEMORY(self->_string, (strlen(self->_string) + strlen(str)));
@@ -176,18 +164,15 @@ int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 
 	/* definindo variáveis locais e valores iniciais */
 	FILE *path;
-	char temp[2] = {'\0', '\0'};
-	char c;
+	char temp[256+2];
 
 	/* Tentando abri o arquivo para leitura e zerando string */
 	if ((path = fopen(file, "r")) == NULL) {return 2;}
 	self->set("");
 
-	/* obtendo caracteres */
-	while((c = fgetc(path)) != EOF) {
-		if (ferror(path)) {return 3;}
-		temp[0] = c;
-		self->add(temp);
+	while (!feof(path)) {
+		if (fgets(temp, 256, path)) self->add(temp);
+		if (ferror(path)) return 3;
 	}
 
 	/* fechando arquivo */
