@@ -151,40 +151,18 @@ int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg)
 	/* verificando memória alocada */
 	if (self->_string == NULL) return 1;
 
-
-
-
-
-	/* definindo variáveis locais e valores iniciais */
-//	char temp[2] = {'\0', '\0'};
-//	char c;
-
-	/* exibindo a mensagem e zerando string*/
-//	printf("%s", msg);
-//	self->set("");
-
-	/* obtendo caracteres */
-//	while((c = fgetc(stdin)) != '\n') {
-//		if (ferror(stdin)) return 2;
-//		temp[0] = c;
-//		self->add(temp);
-//	}
-
-
-
-
-	/* definindo variáveis locais e valores iniciais */
+	/* definindo variáveis locais */
 	char temp[STR_MAX_LENGHT+2];
 
 	/* exibindo a mensagem*/
 	printf("%s", msg);
 
-	/* obtendo caracteres */
+	/* obtendo caracteres e verificando erro */
 	fgets(temp, STR_MAX_LENGHT, stdin);
 	if (ferror(stdin)) return 2;
 
+	/* acertando quebra de linha e definindo valor */
 	if (temp[strlen(temp) - 1] == '\n') temp[strlen(temp) - 1] = '\0';
-
 	self->set(temp);
 
 	return 0;
