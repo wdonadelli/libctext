@@ -13,7 +13,8 @@
 		CHECK_MEMORY(VAR) \
 	}
 
-
+/* Tamanho da String de leitura */
+#define STR_MAX_LENGHT 10000
 
 
 static char _ctext_case(char value, int type)
@@ -113,20 +114,41 @@ int __NewTextObject_read (CTEXT_MAIN_TYPE *self, char *msg)
 	/* verificando memória alocada */
 	if (self->_string == NULL) return 1;
 
+
+
+
+
 	/* definindo variáveis locais e valores iniciais */
-	char temp[2] = {'\0', '\0'};
-	char c;
+//	char temp[2] = {'\0', '\0'};
+//	char c;
 
 	/* exibindo a mensagem e zerando string*/
-	printf("%s", msg);
-	self->set("");
+//	printf("%s", msg);
+//	self->set("");
 
 	/* obtendo caracteres */
-	while((c = fgetc(stdin)) != '\n') {
-		if (ferror(stdin)) return 2;
-		temp[0] = c;
-		self->add(temp);
-	}
+//	while((c = fgetc(stdin)) != '\n') {
+//		if (ferror(stdin)) return 2;
+//		temp[0] = c;
+//		self->add(temp);
+//	}
+
+
+
+
+	/* definindo variáveis locais e valores iniciais */
+	char temp[STR_MAX_LENGHT+2];
+
+	/* exibindo a mensagem*/
+	printf("%s", msg);
+
+	/* obtendo caracteres */
+	fgets(temp, STR_MAX_LENGHT, stdin);
+	if (ferror(stdin)) return 2;
+
+	if (temp[strlen(temp) - 1] == '\n') temp[strlen(temp) - 1] = '\0';
+
+	self->set(temp);
 
 	return 0;
 }
@@ -164,14 +186,14 @@ int __NewTextObject_fread (CTEXT_MAIN_TYPE *self, char *file)
 
 	/* definindo variáveis locais e valores iniciais */
 	FILE *path;
-	char temp[256+2];
+	char temp[STR_MAX_LENGHT+2];
 
 	/* Tentando abri o arquivo para leitura e zerando string */
 	if ((path = fopen(file, "r")) == NULL) return 2;
 	self->set("");
 
 	while (!feof(path)) {
-		if (fgets(temp, 256, path)) self->add(temp);
+		if (fgets(temp, STR_MAX_LENGHT, path)) self->add(temp);
 		if (ferror(path)) return 3;
 	}
 
