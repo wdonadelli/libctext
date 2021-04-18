@@ -30,4 +30,7 @@ make run
 
 #Check application:
 make check
+
+#Clear data:
+make clean
 ```
